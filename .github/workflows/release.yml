@@ -1,0 +1,35 @@
+name: "Fetch releases from Anaconda and publish them on GitHub"
+on: 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to fetch, defaults to latest'
+        default: latest
+
+  # schedule:
+  #   - cron: '0 0 * * *'
+
+jobs:
+  fetch_release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-file: environment.yml
+    
+    - shell: bash -l {0}
+      id: fetch-release
+      run: python fetch_release.py ${{ github.event.inputs.version }}
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: steps.fetch-release.outputs.MICROMAMBA_NEW_VERSION == 'true'
+      with:
+        name: "micromamba ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}"
+        body: |
+          Release artifacts for micromamba ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}, mirrored from conda-forge.
+          The full changelog can be found [here](https://github.com/mamba-org/mamba/releases).
+        tag_name: ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}
+        files: |
+          releases/*
