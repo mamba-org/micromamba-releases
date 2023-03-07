@@ -58,8 +58,7 @@ def get_micromamba(version='latest'):
     version = all_versions.pop()
 
     all_build = set([d["attrs"]["build_number"] for d in rj["distributions"]])
-    assert(len(all_build) == 1)
-    build = all_build.pop()
+    build = max(all_build)
 
     print(f"Existing versions: {existing_tags}")
     if f"{version}-{build}" in existing_tags:
@@ -69,6 +68,8 @@ def get_micromamba(version='latest'):
 
     for d in rj["distributions"]:
         build_number = d["attrs"]["build_number"]
+        if build_number != build:
+            continue
         buildplat = d["attrs"]["subdir"]
 
         url = d["download_url"]
