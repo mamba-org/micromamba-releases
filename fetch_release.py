@@ -19,10 +19,6 @@ known_subdirs = {
     'win-64'
 }
 
-# def get_all_tags(): 
-#     tags = subprocess.check_output(["git", "tag", "-l"]).decode('utf-8')
-#     return set(tags.splitlines())
-
 def get_all_tags_github():
     url = "https://api.github.com/repos/mamba-org/micromamba-releases/tags"
     r = requests.get(url, timeout=10)

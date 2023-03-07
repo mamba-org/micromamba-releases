@@ -6,8 +6,8 @@ on:
         description: 'Version to fetch, defaults to latest'
         default: latest
 
-  # schedule:
-  #   - cron: '0 0 * * *'
+  schedule:
+    - cron: 0 */6 * * *
 
 jobs:
   fetch_release:
