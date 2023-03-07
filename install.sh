@@ -55,4 +55,7 @@ fi
 
 if [[ "$YES" == "" || "$YES" == "y" || "$YES" == "Y" || "$YES" == "yes" ]]; then
   $BIN_FOLDER/micromamba shell init -p "$PREFIXLOCATION"
+
+  echo "Please restart your shell to activate micromamba or run the following:\n"
+  echo "  source ~/.bashrc (or ~/.zshrc, ...)"
 fi
