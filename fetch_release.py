@@ -69,7 +69,7 @@ def get_micromamba(version='latest'):
         buildplat = d["attrs"]["subdir"]
 
         url = d["download_url"]
-        sha256 = d["sha256"]
+        dsum = d["sha256"]
 
         dplat = d["attrs"]["subdir"]
 
@@ -86,6 +86,14 @@ def get_micromamba(version='latest'):
         dlloc = Path(f"micromamba-{version}-{build_number}-{dplat}{ext}")
         with open(dlloc, "wb") as f:
             f.write(r.content)
+
+        # verify the sha256
+        sha256 = hashlib.sha256()
+        with open(dlloc, "rb") as f:
+            sha256.update(f.read())
+        dlsum = sha256.hexdigest()
+        if dlsum != dsum:
+            raise Exception(f"checksum mismatch, expected {dsum} but was {dlsum}")
 
         # extract the file
         extract_dir = Path(f"micromamba-{version}-{build_number}-{dplat}")
