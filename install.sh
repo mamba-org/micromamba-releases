@@ -17,7 +17,7 @@ fi
 
 
 # Fallbacks
-BIN_FOLDER="${PREFIXLOCATION:-${HOME}/.local/bin}"
+BIN_FOLDER="${BIN_FOLDER:-${HOME}/.local/bin}"
 PREFIXLOCATION="${PREFIXLOCATION:-${HOME}/micromamba}"
 INIT_YES="${INIT_YES:-yes}"
 CONDA_FORGE_YES="${CONDA_FORGE_YES:-no}"
