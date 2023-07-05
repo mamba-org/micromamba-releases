@@ -1,9 +1,30 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
-ARCH=$(uname -m)
-OS=$(uname)
+
+# Parsing arguments
+if [ -t 0 ] ; then
+  printf "Micromamba binary folder? [~/.local/bin] "
+  read BIN_FOLDER
+  printf "Prefix location? [~/micromamba] "
+  read PREFIXLOCATION
+  printf "Init shell? [Y/n] "
+  read INIT_YES
+  printf "Configure conda-forge? [Y/n] "
+  read CONDA_FORGE_YES
+fi
+
+
+# Fallbacks
+BIN_FOLDER="${PREFIXLOCATION:-${HOME}/.local/bin}"
+PREFIXLOCATION="${PREFIXLOCATION:-${HOME}/micromamba}"
+INIT_YES="${INIT_YES:-yes}"
+CONDA_FORGE_YES="${CONDA_FORGE_YES:-no}"
+
+# Computing artifact location
+ARCH="$(uname -m)"
+OS="$(uname)"
 
 if [[ "$OS" == "Linux" ]]; then
   PLATFORM="linux"
@@ -30,31 +51,36 @@ else
 fi
 
 if [[ "${VERSION:-}" == "" ]]; then
-  RELEASE_URL=https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-$PLATFORM-$ARCH
+  RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-${PLATFORM-$ARCH}"
 else
-  RELEASE_URL=https://github.com/mamba-org/micromamba-releases/releases/download/micromamba-$VERSION/micromamba-$PLATFORM-$ARCH
+  RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/download/micromamba-${VERSION}/micromamba-${PLATFORM-$ARCH}"
 fi
 
-BIN_FOLDER=~/.local/bin
-mkdir -p $BIN_FOLDER
-curl $RELEASE_URL -o $BIN_FOLDER/micromamba -fsSL --compressed ${CURL_OPTS:-}
-chmod +x $BIN_FOLDER/micromamba
 
-if [ -t 0 ] ; then
-  printf "Init shell? [Y/n] "
-  read YES
-  printf "Prefix location? [~/micromamba] "
-  read PREFIXLOCATION
-else
-  YES="yes"
+# Downloading artifact
+mkdir -p "${BIN_FOLDER}"
+curl "${RELEASE_URL}" -o "${BIN_FOLDER}/micromamba" -fsSL --compressed ${CURL_OPTS:-}
+chmod +x "${BIN_FOLDER}/micromamba"
+
+
+# Initializing conda-forge
+if [[ "$CONDA_FORGE_YES" == "" || "$CONDA_FORGE_YES" == "y" || "$CONDA_FORGE_YES" == "Y" || "$CONDA_FORGE_YES" == "yes" ]]; then
+  "${BIN_FOLDER}/micromamba" config append channels conda-forge
+  "${BIN_FOLDER}/micromamba" config append channels nodefaults
+  "${BIN_FOLDER}/micromamba" config set channel_priority strict
 fi
 
-if [[ "${PREFIXLOCATION:-}" == "" ]]; then
-  PREFIXLOCATION="~/micromamba"
-fi
 
-if [[ "$YES" == "" || "$YES" == "y" || "$YES" == "Y" || "$YES" == "yes" ]]; then
-  $BIN_FOLDER/micromamba shell init -p "$PREFIXLOCATION"
+# Initializing shell
+if [[ "$INIT_YES" == "" || "$INIT_YES" == "y" || "$INIT_YES" == "Y" || "$INIT_YES" == "yes" ]]; then
+  case "$("${BIN_FOLDER}/micromamba" --version)" in
+    1.*|0.*)
+      "${BIN_FOLDER}/micromamba" shell init -p "${PREFIXLOCATION}"
+      ;;
+    *)
+      "${BIN_FOLDER}/micromamba" shell init --root-prefix "${PREFIXLOCATION}"
+      ;;
+  esac
 
   echo "Please restart your shell to activate micromamba or run the following:\n"
   echo "  source ~/.bashrc (or ~/.zshrc, ...)"
