@@ -63,14 +63,6 @@ curl "${RELEASE_URL}" -o "${BIN_FOLDER}/micromamba" -fsSL --compressed ${CURL_OP
 chmod +x "${BIN_FOLDER}/micromamba"
 
 
-# Initializing conda-forge
-if [[ "$CONDA_FORGE_YES" == "" || "$CONDA_FORGE_YES" == "y" || "$CONDA_FORGE_YES" == "Y" || "$CONDA_FORGE_YES" == "yes" ]]; then
-  "${BIN_FOLDER}/micromamba" config append channels conda-forge
-  "${BIN_FOLDER}/micromamba" config append channels nodefaults
-  "${BIN_FOLDER}/micromamba" config set channel_priority strict
-fi
-
-
 # Initializing shell
 if [[ "$INIT_YES" == "" || "$INIT_YES" == "y" || "$INIT_YES" == "Y" || "$INIT_YES" == "yes" ]]; then
   case "$("${BIN_FOLDER}/micromamba" --version)" in
@@ -84,4 +76,12 @@ if [[ "$INIT_YES" == "" || "$INIT_YES" == "y" || "$INIT_YES" == "Y" || "$INIT_YE
 
   echo "Please restart your shell to activate micromamba or run the following:\n"
   echo "  source ~/.bashrc (or ~/.zshrc, ...)"
+fi
+
+
+# Initializing conda-forge
+if [[ "$CONDA_FORGE_YES" == "" || "$CONDA_FORGE_YES" == "y" || "$CONDA_FORGE_YES" == "Y" || "$CONDA_FORGE_YES" == "yes" ]]; then
+  "${BIN_FOLDER}/micromamba" config append channels conda-forge
+  "${BIN_FOLDER}/micromamba" config append channels nodefaults
+  "${BIN_FOLDER}/micromamba" config set channel_priority strict
 fi
