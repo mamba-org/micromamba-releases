@@ -2,25 +2,31 @@
 
 set -eu
 
-
 # Parsing arguments
 if [ -t 0 ] ; then
   printf "Micromamba binary folder? [~/.local/bin] "
   read BIN_FOLDER
-  printf "Prefix location? [~/micromamba] "
-  read PREFIXLOCATION
   printf "Init shell? [Y/n] "
   read INIT_YES
   printf "Configure conda-forge? [Y/n] "
   read CONDA_FORGE_YES
 fi
 
-
 # Fallbacks
 BIN_FOLDER="${BIN_FOLDER:-${HOME}/.local/bin}"
-PREFIXLOCATION="${PREFIXLOCATION:-${HOME}/micromamba}"
 INIT_YES="${INIT_YES:-yes}"
 CONDA_FORGE_YES="${CONDA_FORGE_YES:-no}"
+
+# Prefix location is relevant only if we want to call `micromamba shell init`
+case "$INIT_YES" in
+  y|Y|yes)
+    if [ -t 0 ]; then
+      printf "Prefix location? [~/micromamba] "
+      read PREFIX_LOCATION
+    fi
+    ;;
+esac
+PREFIX_LOCATION="${PREFIX_LOCATION:-${HOME}/micromamba}"
 
 # Computing artifact location
 case "`uname`" in
@@ -72,10 +78,10 @@ case "$INIT_YES" in
   y|Y|yes)
     case "`"${BIN_FOLDER}/micromamba" --version`" in
       1.*|0.*)
-        "${BIN_FOLDER}/micromamba" shell init -p "${PREFIXLOCATION}"
+        "${BIN_FOLDER}/micromamba" shell init -p "${PREFIX_LOCATION}"
         ;;
       *)
-        "${BIN_FOLDER}/micromamba" shell init --root-prefix "${PREFIXLOCATION}"
+        "${BIN_FOLDER}/micromamba" shell init --root-prefix "${PREFIX_LOCATION}"
         ;;
     esac
 
