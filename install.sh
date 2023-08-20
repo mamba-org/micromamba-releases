@@ -78,12 +78,24 @@ case "$INIT_YES" in
   y|Y|yes)
     case "`"${BIN_FOLDER}/micromamba" --version`" in
       1.*|0.*)
-        "${BIN_FOLDER}/micromamba" shell init -p "${PREFIX_LOCATION}"
+        shell_arg=-s
+        prefix_arg=-p
         ;;
       *)
-        "${BIN_FOLDER}/micromamba" shell init --root-prefix "${PREFIX_LOCATION}"
+        shell_arg=--shell
+        prefix_arg=--root-prefix
         ;;
     esac
+
+    SHELLS=
+    [ -e $HOME/.bashrc ] && SHELLS="$SHELLS bash"
+    [ -e "${XDG_CONFIG_HOME:-$HOME/.config}/fish" ] && SHELLS="$SHELLS fish"
+    [ -e "$HOME/.xonshrc" -o -e "${XDG_CONFIG_HOME:-$HOME/.config}/xonsh" ] && SHELLS="$SHELLS xonsh"
+    [ -e "${ZDOTDIR:-$HOME}/.zshrc" ] && SHELLS="$SHELLS zsh"
+
+    for shell in $SHELLS; do
+        "${BIN_FOLDER}/micromamba" shell init $shell_arg $shell $prefix_arg "$PREFIX_LOCATION"
+    done
 
     echo "Please restart your shell to activate micromamba or run the following:\n"
     echo "  source ~/.bashrc (or ~/.zshrc, ...)"
