@@ -23,32 +23,29 @@ INIT_YES="${INIT_YES:-yes}"
 CONDA_FORGE_YES="${CONDA_FORGE_YES:-no}"
 
 # Computing artifact location
-ARCH="$(uname -m)"
-OS="$(uname)"
+case "`uname`" in
+  Linux)
+    PLATFORM="linux" ;;
+  Darwin)
+    PLATFORM="osx" ;;
+  *NT*)
+    PLATFORM="win" ;;
+esac
 
-if [[ "$OS" == "Linux" ]]; then
-  PLATFORM="linux"
-  if [[ "$ARCH" == "aarch64" ]]; then
-    ARCH="aarch64"
-  elif [[ $ARCH == "ppc64le" ]]; then
-    ARCH="ppc64le"
-  else
-    ARCH="64"
-  fi    
-elif [[ "$OS" == "Darwin" ]]; then
-  PLATFORM="osx"
-  if [[ "$ARCH" == "arm64" ]]; then
-    ARCH="arm64"
-  else
-    ARCH="64"
-  fi
-elif [[ "$OS" =~ "NT" ]]; then
-  PLATFORM="win"
-  ARCH="64"
-else
-  echo "Failed to detect your OS" >&2
-  exit 1
-fi
+ARCH="`uname -m`"
+case "$ARCH" in
+  aarch64|ppc64le|arm64) ;;
+  *)
+    ARCH="64" ;;
+esac
+
+case "$PLATFORM-$ARCH" in
+  linux-aarch64|linux-ppc64le|linux-64|osx-arm64|osx-64|win-64) ;;
+  *)
+    echo "Failed to detect your OS" >&2
+    exit 1
+    ;;
+esac
 
 if [[ "${VERSION:-}" == "" ]]; then
   RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-${PLATFORM}-${ARCH}"
