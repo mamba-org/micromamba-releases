@@ -56,7 +56,14 @@ fi
 
 # Downloading artifact
 mkdir -p "${BIN_FOLDER}"
-curl "${RELEASE_URL}" -o "${BIN_FOLDER}/micromamba" -fsSL --compressed ${CURL_OPTS:-}
+if hash curl >/dev/null 2>&1; then
+  curl "${RELEASE_URL}" -o "${BIN_FOLDER}/micromamba" -fsSL --compressed ${CURL_OPTS:-}
+elif hash wget >/dev/null 2>&1; then
+  wget ${WGET_OPTS:-} -qO "${BIN_FOLDER}/micromamba" "${RELEASE_URL}"
+else
+  echo "Neither curl nor wget was found" >&2
+  exit 1
+fi
 chmod +x "${BIN_FOLDER}/micromamba"
 
 
