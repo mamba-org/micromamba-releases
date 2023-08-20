@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 set -eu
 
@@ -47,7 +47,7 @@ case "$PLATFORM-$ARCH" in
     ;;
 esac
 
-if [[ "${VERSION:-}" == "" ]]; then
+if [ "${VERSION:-}" = "" ]; then
   RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-${PLATFORM}-${ARCH}"
 else
   RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/download/micromamba-${VERSION}/micromamba-${PLATFORM}-${ARCH}"
@@ -61,24 +61,28 @@ chmod +x "${BIN_FOLDER}/micromamba"
 
 
 # Initializing shell
-if [[ "$INIT_YES" == "" || "$INIT_YES" == "y" || "$INIT_YES" == "Y" || "$INIT_YES" == "yes" ]]; then
-  case "$("${BIN_FOLDER}/micromamba" --version)" in
-    1.*|0.*)
-      "${BIN_FOLDER}/micromamba" shell init -p "${PREFIXLOCATION}"
-      ;;
-    *)
-      "${BIN_FOLDER}/micromamba" shell init --root-prefix "${PREFIXLOCATION}"
-      ;;
-  esac
+case "$INIT_YES" in
+  y|Y|yes)
+    case "`"${BIN_FOLDER}/micromamba" --version`" in
+      1.*|0.*)
+        "${BIN_FOLDER}/micromamba" shell init -p "${PREFIXLOCATION}"
+        ;;
+      *)
+        "${BIN_FOLDER}/micromamba" shell init --root-prefix "${PREFIXLOCATION}"
+        ;;
+    esac
 
-  echo "Please restart your shell to activate micromamba or run the following:\n"
-  echo "  source ~/.bashrc (or ~/.zshrc, ...)"
-fi
+    echo "Please restart your shell to activate micromamba or run the following:\n"
+    echo "  source ~/.bashrc (or ~/.zshrc, ...)"
+    ;;
+esac
 
 
 # Initializing conda-forge
-if [[ "$CONDA_FORGE_YES" == "" || "$CONDA_FORGE_YES" == "y" || "$CONDA_FORGE_YES" == "Y" || "$CONDA_FORGE_YES" == "yes" ]]; then
-  "${BIN_FOLDER}/micromamba" config append channels conda-forge
-  "${BIN_FOLDER}/micromamba" config append channels nodefaults
-  "${BIN_FOLDER}/micromamba" config set channel_priority strict
-fi
+case "$CONDA_FORGE_YES" in
+  y|Y|yes)
+    "${BIN_FOLDER}/micromamba" config append channels conda-forge
+    "${BIN_FOLDER}/micromamba" config append channels nodefaults
+    "${BIN_FOLDER}/micromamba" config set channel_priority strict
+    ;;
+esac
