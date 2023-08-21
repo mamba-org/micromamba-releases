@@ -29,7 +29,7 @@ esac
 PREFIX_LOCATION="${PREFIX_LOCATION:-${HOME}/micromamba}"
 
 # Computing artifact location
-case "`uname`" in
+case "$(uname)" in
   Linux)
     PLATFORM="linux" ;;
   Darwin)
@@ -38,7 +38,7 @@ case "`uname`" in
     PLATFORM="win" ;;
 esac
 
-ARCH="`uname -m`"
+ARCH="$(uname -m)"
 case "$ARCH" in
   aarch64|ppc64le|arm64)
       ;;  # pass
@@ -78,7 +78,7 @@ chmod +x "${BIN_FOLDER}/micromamba"
 # Initializing shell
 case "$INIT_YES" in
   y|Y|yes)
-    case "`"${BIN_FOLDER}/micromamba" --version`" in
+    case $("${BIN_FOLDER}/micromamba" --version) in
       1.*|0.*)
         shell_arg=-s
         prefix_arg=-p
