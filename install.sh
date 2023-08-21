@@ -40,7 +40,8 @@ esac
 
 ARCH="`uname -m`"
 case "$ARCH" in
-  aarch64|ppc64le|arm64) ;;
+  aarch64|ppc64le|arm64)
+      ;;  # pass
   *)
     ARCH="64" ;;
 esac
