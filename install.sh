@@ -2,11 +2,25 @@
 
 set -eu
 
+# Detect the shell from which the script was called
+parent=$(ps -o comm $PPID |tail -1)
+parent=${parent#-}  # remove the leading dash that login shells have
+case "$parent" in
+  # shells supported by `micromamba shell init`
+  bash|fish|xonsh|zsh)
+    shell=$parent
+    ;;
+  *)
+    # use the login shell (basename of $SHELL) as a fallback
+    shell=${SHELL##*/}
+    ;;
+esac
+
 # Parsing arguments
 if [ -t 0 ] ; then
   printf "Micromamba binary folder? [~/.local/bin] "
   read BIN_FOLDER
-  printf "Init shell? [Y/n] "
+  printf "Init shell ($shell)? [Y/n] "
   read INIT_YES
   printf "Configure conda-forge? [Y/n] "
   read CONDA_FORGE_YES
@@ -88,19 +102,14 @@ case "$INIT_YES" in
         prefix_arg=--root-prefix
         ;;
     esac
-
-    SHELLS=
-    [ -e $HOME/.bashrc ] && SHELLS="$SHELLS bash"
-    [ -e "${XDG_CONFIG_HOME:-$HOME/.config}/fish" ] && SHELLS="$SHELLS fish"
-    [ -e "$HOME/.xonshrc" -o -e "${XDG_CONFIG_HOME:-$HOME/.config}/xonsh" ] && SHELLS="$SHELLS xonsh"
-    [ -e "${ZDOTDIR:-$HOME}/.zshrc" ] && SHELLS="$SHELLS zsh"
-
-    for shell in $SHELLS; do
-        "${BIN_FOLDER}/micromamba" shell init $shell_arg $shell $prefix_arg "$PREFIX_LOCATION"
-    done
+    "${BIN_FOLDER}/micromamba" shell init $shell_arg "$shell" $prefix_arg "$PREFIX_LOCATION"
 
     echo "Please restart your shell to activate micromamba or run the following:\n"
-    echo "  source ~/.bashrc (or ~/.zshrc, ...)"
+    echo "  source ~/.bashrc (or ~/.zshrc, ~/.xonshrc, ~/.config/fish/config.fish, ...)"
+    ;;
+  *)
+    echo "You can initialize your shell later by running:"
+    echo "  micromamba shell init"
     ;;
 esac
 
