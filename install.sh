@@ -1,56 +1,75 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 set -eu
 
+# Detect the shell from which the script was called
+parent=$(ps -o comm $PPID |tail -1)
+parent=${parent#-}  # remove the leading dash that login shells have
+case "$parent" in
+  # shells supported by `micromamba shell init`
+  bash|fish|xonsh|zsh)
+    shell=$parent
+    ;;
+  *)
+    # use the login shell (basename of $SHELL) as a fallback
+    shell=${SHELL##*/}
+    ;;
+esac
 
 # Parsing arguments
 if [ -t 0 ] ; then
   printf "Micromamba binary folder? [~/.local/bin] "
   read BIN_FOLDER
-  printf "Prefix location? [~/micromamba] "
-  read PREFIXLOCATION
-  printf "Init shell? [Y/n] "
+  printf "Init shell ($shell)? [Y/n] "
   read INIT_YES
   printf "Configure conda-forge? [Y/n] "
   read CONDA_FORGE_YES
 fi
 
-
 # Fallbacks
 BIN_FOLDER="${BIN_FOLDER:-${HOME}/.local/bin}"
-PREFIXLOCATION="${PREFIXLOCATION:-${HOME}/micromamba}"
 INIT_YES="${INIT_YES:-yes}"
 CONDA_FORGE_YES="${CONDA_FORGE_YES:-no}"
 
+# Prefix location is relevant only if we want to call `micromamba shell init`
+case "$INIT_YES" in
+  y|Y|yes)
+    if [ -t 0 ]; then
+      printf "Prefix location? [~/micromamba] "
+      read PREFIX_LOCATION
+    fi
+    ;;
+esac
+PREFIX_LOCATION="${PREFIX_LOCATION:-${HOME}/micromamba}"
+
 # Computing artifact location
+case "$(uname)" in
+  Linux)
+    PLATFORM="linux" ;;
+  Darwin)
+    PLATFORM="osx" ;;
+  *NT*)
+    PLATFORM="win" ;;
+esac
+
 ARCH="$(uname -m)"
-OS="$(uname)"
+case "$ARCH" in
+  aarch64|ppc64le|arm64)
+      ;;  # pass
+  *)
+    ARCH="64" ;;
+esac
 
-if [[ "$OS" == "Linux" ]]; then
-  PLATFORM="linux"
-  if [[ "$ARCH" == "aarch64" ]]; then
-    ARCH="aarch64"
-  elif [[ $ARCH == "ppc64le" ]]; then
-    ARCH="ppc64le"
-  else
-    ARCH="64"
-  fi    
-elif [[ "$OS" == "Darwin" ]]; then
-  PLATFORM="osx"
-  if [[ "$ARCH" == "arm64" ]]; then
-    ARCH="arm64"
-  else
-    ARCH="64"
-  fi
-elif [[ "$OS" =~ "NT" ]]; then
-  PLATFORM="win"
-  ARCH="64"
-else
-  echo "Failed to detect your OS" >&2
-  exit 1
-fi
+case "$PLATFORM-$ARCH" in
+  linux-aarch64|linux-ppc64le|linux-64|osx-arm64|osx-64|win-64)
+      ;;  # pass
+  *)
+    echo "Failed to detect your OS" >&2
+    exit 1
+    ;;
+esac
 
-if [[ "${VERSION:-}" == "" ]]; then
+if [ "${VERSION:-}" = "" ]; then
   RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-${PLATFORM}-${ARCH}"
 else
   RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/download/micromamba-${VERSION}/micromamba-${PLATFORM}-${ARCH}"
@@ -59,29 +78,47 @@ fi
 
 # Downloading artifact
 mkdir -p "${BIN_FOLDER}"
-curl "${RELEASE_URL}" -o "${BIN_FOLDER}/micromamba" -fsSL --compressed ${CURL_OPTS:-}
+if hash curl >/dev/null 2>&1; then
+  curl "${RELEASE_URL}" -o "${BIN_FOLDER}/micromamba" -fsSL --compressed ${CURL_OPTS:-}
+elif hash wget >/dev/null 2>&1; then
+  wget ${WGET_OPTS:-} -qO "${BIN_FOLDER}/micromamba" "${RELEASE_URL}"
+else
+  echo "Neither curl nor wget was found" >&2
+  exit 1
+fi
 chmod +x "${BIN_FOLDER}/micromamba"
 
 
 # Initializing shell
-if [[ "$INIT_YES" == "" || "$INIT_YES" == "y" || "$INIT_YES" == "Y" || "$INIT_YES" == "yes" ]]; then
-  case "$("${BIN_FOLDER}/micromamba" --version)" in
-    1.*|0.*)
-      "${BIN_FOLDER}/micromamba" shell init -p "${PREFIXLOCATION}"
-      ;;
-    *)
-      "${BIN_FOLDER}/micromamba" shell init --root-prefix "${PREFIXLOCATION}"
-      ;;
-  esac
+case "$INIT_YES" in
+  y|Y|yes)
+    case $("${BIN_FOLDER}/micromamba" --version) in
+      1.*|0.*)
+        shell_arg=-s
+        prefix_arg=-p
+        ;;
+      *)
+        shell_arg=--shell
+        prefix_arg=--root-prefix
+        ;;
+    esac
+    "${BIN_FOLDER}/micromamba" shell init $shell_arg "$shell" $prefix_arg "$PREFIX_LOCATION"
 
-  echo "Please restart your shell to activate micromamba or run the following:\n"
-  echo "  source ~/.bashrc (or ~/.zshrc, ...)"
-fi
+    echo "Please restart your shell to activate micromamba or run the following:\n"
+    echo "  source ~/.bashrc (or ~/.zshrc, ~/.xonshrc, ~/.config/fish/config.fish, ...)"
+    ;;
+  *)
+    echo "You can initialize your shell later by running:"
+    echo "  micromamba shell init"
+    ;;
+esac
 
 
 # Initializing conda-forge
-if [[ "$CONDA_FORGE_YES" == "" || "$CONDA_FORGE_YES" == "y" || "$CONDA_FORGE_YES" == "Y" || "$CONDA_FORGE_YES" == "yes" ]]; then
-  "${BIN_FOLDER}/micromamba" config append channels conda-forge
-  "${BIN_FOLDER}/micromamba" config append channels nodefaults
-  "${BIN_FOLDER}/micromamba" config set channel_priority strict
-fi
+case "$CONDA_FORGE_YES" in
+  y|Y|yes)
+    "${BIN_FOLDER}/micromamba" config append channels conda-forge
+    "${BIN_FOLDER}/micromamba" config append channels nodefaults
+    "${BIN_FOLDER}/micromamba" config set channel_priority strict
+    ;;
+esac
