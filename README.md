@@ -11,17 +11,14 @@ The `pfx.dev` URLs are just shorthands for the URLs to the raw files on Github f
 On Linux and macOS, this script downloads the micromamba release file and places it in `~/.local/bin`. The script then asks you if you want to perform "shell initialization". If yes, shell initialization will add a block to your `~/.bashrc` or `.zshrc` file. You can choose to do that later by executing `micromamba shell init`. Shell initialization is necessary to properly activate and deactivate virtual environments, however you can use micromamba without and use `micromamba run -n myenv` or `micromamba shell -n myenv` functions to run in or drop into virtual environments.
 
 ```bash
-curl https://micromamba.pfx.dev/install.sh | bash
-
-# or if you prefer `zsh`, it should work just as well
-
-curl https://micromamba.pfx.dev/install.sh | zsh
+"${SHELL}" <(curl -L https://micro.mamba.pm/install.sh)
 ```
 
 ### Windows
 
 On Windows, the executable `micromamba.exe` is installed into `$Env:LocalAppData\micromamba\micromamba.exe`.
 
+With Powershell:
 ```powershell
-Invoke-Expression ((Invoke-WebRequest -Uri https://micromamba.pfx.dev/install.ps1).Content)
+Invoke-Expression ((Invoke-WebRequest -Uri https://micro.mamba.pm/install.ps1).Content)
 ```
