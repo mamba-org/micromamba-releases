@@ -24,10 +24,12 @@ jobs:
           - {os: macos-latest, shell: bash, shell-source-param: -l}
           - {os: windows-latest, shell: bash, shell-source-param: -l}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
         # Need to force the shell to get the default *calling* shell right
         run: |
-          ${{ matrix.shell }} ./install.sh
+          ${{ matrix.shell }} -c '${{ matrix.shell }} ./install.sh'
       - name: Test Micromamba
         # use either -l or -i to source .bash_profile or .bashrc/.zshrc
         run: |
