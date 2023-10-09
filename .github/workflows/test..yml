@@ -1,0 +1,38 @@
+name: Test install scripts
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test_install:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, shell: bash, shell-source-param: -i}
+          - {os: macos-latest, shell: zsh, shell-source-param: -i}
+          - {os: macos-latest, shell: bash, shell-source-param: -l}
+          - {os: windows-latest, shell: bash, shell-source-param: -l}
+    steps:
+      - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
+        # Need to force the shell to get the default *calling* shell right
+        run: |
+          ${{ matrix.shell }} ./install.sh
+      - name: Test Micromamba
+        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
+        run: |
+          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba
+      - name: Test Micromamba
+        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
+        run: |
+          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba
