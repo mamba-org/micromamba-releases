@@ -36,8 +36,9 @@ jobs:
           - {os: windows-latest, shell: bash, shell-source-param: -l}
     steps:
       - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
+        # Need to force the shell to get the default *calling* shell right
         run: |
-          curl -sL http://micro.mamba.pm/install.sh | ${{ matrix.shell }}
+          ${{ matrix.shell }} -c 'curl -sL http://micro.mamba.pm/install.sh | ${SHELL}'
       - name: Test Micromamba
         # use either -l or -i to source .bash_profile or .bashrc/.zshrc
         run: |
