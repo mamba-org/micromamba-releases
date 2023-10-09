@@ -36,9 +36,12 @@ jobs:
           - {os: windows-latest, shell: bash, shell-source-param: -l}
     steps:
       - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
-        shell: ${{ matrix.shell }}
         run: |
-          "${SHELL}" <(curl -sL http://micro.mamba.pm/install.sh)
+          ${{ matrix.shell }} <(curl -sL http://micro.mamba.pm/install.sh)
+      - name: Test Micromamba
+        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
+        run: |
+          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba
       - name: Test Micromamba
         # use either -l or -i to source .bash_profile or .bashrc/.zshrc
         shell: ${{ matrix.shell }} -ec ${{ matrix.shell-source-param }} {0}
