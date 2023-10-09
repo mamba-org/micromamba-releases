@@ -1,0 +1,52 @@
+name: Test install scripts
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test_install:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, shell: bash, shell-source-param: -i}
+          - {os: macos-latest, shell: zsh, shell-source-param: -i}
+          - {os: macos-latest, shell: bash, shell-source-param: -l}
+          - {os: windows-latest, shell: bash, shell-source-param: -l}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
+        # Need to force the shell to get the default *calling* shell right
+        run: |
+          ${{ matrix.shell }} -c 'cat ./install.sh | ${SHELL}'
+      - name: Test Micromamba
+        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
+        run: |
+          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba
+      - name: Test Micromamba is found
+        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
+        run: |
+          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba --help
+      - name: Test Micromamba is found
+        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
+        run: |
+          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba --help
+      - name: Test create environment
+        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
+        run: |
+          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba create -c conda-forge -n test python
+      - name: Test activate environment
+        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
+        run: |
+          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba activate -n test
