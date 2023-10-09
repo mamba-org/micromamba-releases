@@ -37,7 +37,7 @@ jobs:
     steps:
       - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
         run: |
-          ${{ matrix.shell }} <(curl -sL http://micro.mamba.pm/install.sh)
+          curl -sL http://micro.mamba.pm/install.sh | ${{ matrix.shell }}
       - name: Test Micromamba
         # use either -l or -i to source .bash_profile or .bashrc/.zshrc
         run: |
