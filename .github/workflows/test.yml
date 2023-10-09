@@ -29,7 +29,7 @@ jobs:
       - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
         # Need to force the shell to get the default *calling* shell right
         run: |
-          ${{ matrix.shell }} -c '${{ matrix.shell }} ./install.sh'
+          ${{ matrix.shell }} -c 'cat ./install.sh | ${SHELL}'
       - name: Test Micromamba
         # use either -l or -i to source .bash_profile or .bashrc/.zshrc
         run: |
