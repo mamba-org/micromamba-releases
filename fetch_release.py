@@ -53,6 +53,11 @@ def get_micromamba(version='latest'):
     assert(len(all_versions) == 1)
     version = all_versions.pop()
 
+    if "alpha" in version or "beta" in version:
+        print("Skipping alpha/beta version")
+        set_output("MICROMAMBA_NEW_VERSION", "false")
+        return
+
     all_build = set([d["attrs"]["build_number"] for d in rj["distributions"]])
     build = max(all_build)
 
