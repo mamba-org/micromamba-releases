@@ -22,7 +22,9 @@ jobs:
     
     - shell: bash -l {0}
       id: fetch-release
-      run: python fetch_release.py ${{ github.event.inputs.version }}
+      run: |
+        python -m pip install packaging
+        python fetch_release.py ${{ github.event.inputs.version }}
 
     - name: Release
       uses: softprops/action-gh-release@v1
