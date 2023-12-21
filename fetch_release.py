@@ -3,21 +3,23 @@ import shutil
 import requests
 import rich
 from pathlib import Path
-from datetime import timedelta
 import hashlib
 import subprocess
 import sys
 
+from packaging.version import Version
+
 cache = {}
 
 known_subdirs = {
-    'linux-64',
-    'linux-ppc64le',
-    'linux-aarch64',
-    'osx-64',
-    'osx-arm64',
-    'win-64'
+    "linux-64",
+    "linux-ppc64le",
+    "linux-aarch64",
+    "osx-64",
+    "osx-arm64",
+    "win-64",
 }
+
 
 def get_all_tags_github():
     url = "https://api.github.com/repos/mamba-org/micromamba-releases/tags"
@@ -26,15 +28,20 @@ def get_all_tags_github():
     tags = [t["name"] for t in r.json()]
     return set(tags)
 
+
 def extract_with_microamamba(archive, outdir):
-    subprocess.check_call(["micromamba", "package", "extract", str(archive), str(outdir)])
+    subprocess.check_call(
+        ["micromamba", "package", "extract", str(archive), str(outdir)]
+    )
+
 
 def set_output(name, value):
     if os.environ.get("GITHUB_OUTPUT"):
-        with open(os.environ.get("GITHUB_OUTPUT"), 'a') as fh:
-            print(f'{name}={value}\n', file=fh)
+        with open(os.environ.get("GITHUB_OUTPUT"), "a") as fh:
+            print(f"{name}={value}\n", file=fh)
 
-def get_micromamba(version='latest'):
+
+def get_micromamba(version="latest"):
     url = f"https://api.anaconda.org/release/conda-forge/micromamba/{version}"
     existing_tags = get_all_tags_github()
     print("Getting Anaconda.org API")
@@ -48,13 +55,13 @@ def get_micromamba(version='latest'):
 
     if not known_subdirs.issubset(all_subdirs):
         raise ValueError(f"Missing subdirs: {known_subdirs - all_subdirs}")
-    
+
     all_versions = set([d["version"] for d in rj["distributions"]])
-    assert(len(all_versions) == 1)
+    assert len(all_versions) == 1
     version = all_versions.pop()
 
-    if "alpha" in version or "beta" in version:
-        print("Skipping alpha/beta version")
+    if (v := Version(version)).is_devrelease or v.is_prerelease:
+        print(f"Skipping dev and pre releases version '{version}'")
         set_output("MICROMAMBA_NEW_VERSION", "false")
         return
 
@@ -78,10 +85,9 @@ def get_micromamba(version='latest'):
 
         dplat = d["attrs"]["subdir"]
 
-        # fetch file and extract it 
+        # fetch file and extract it
         r = requests.get(f"https:{url}", timeout=10)
         r.raise_for_status()
-
 
         path = Path(d["basename"])
         if d["basename"].endswith(".tar.bz2"):
