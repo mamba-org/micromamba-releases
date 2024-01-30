@@ -4,7 +4,7 @@ if "%VERSION%"=="" (
     SET VERSION=latest
 )
 
-RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/%VERSION%/download/micromamba-win-64"
+SET RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/%VERSION%/download/micromamba-win-64"
 
 REM Download micromamba using curl.exe
 curl.exe -L -o micromamba.exe %RELEASE_URL%
