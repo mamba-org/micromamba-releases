@@ -29,7 +29,7 @@ fi
 # Fallbacks
 BIN_FOLDER="${BIN_FOLDER:-${HOME}/.local/bin}"
 INIT_YES="${INIT_YES:-yes}"
-CONDA_FORGE_YES="${CONDA_FORGE_YES:-no}"
+CONDA_FORGE_YES="${CONDA_FORGE_YES:-yes}"
 
 # Prefix location is relevant only if we want to call `micromamba shell init`
 case "$INIT_YES" in
