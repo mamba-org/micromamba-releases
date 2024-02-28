@@ -20,5 +20,5 @@ On Windows, the executable `micromamba.exe` is installed into `$Env:LocalAppData
 
 With Powershell:
 ```powershell
-Invoke-Expression ((Invoke-WebRequest -Uri https://micro.mamba.pm/install.ps1).Content)
+irm https://micro.mamba.pm/install.ps1 | iex
 ```
