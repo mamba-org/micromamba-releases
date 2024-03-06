@@ -2,19 +2,31 @@
 
 set -eu
 
-# Detect the shell from which the script was called
-parent=$(ps -o comm $PPID |tail -1)
-parent=${parent#-}  # remove the leading dash that login shells have
-case "$parent" in
-  # shells supported by `micromamba shell init`
-  bash|fish|xonsh|zsh)
-    shell=$parent
-    ;;
-  *)
-    # use the login shell (basename of $SHELL) as a fallback
-    shell=${SHELL##*/}
-    ;;
-esac
+if [ -n "$INIT_WHICH_SHELL" ]; then
+  shell=$INIT_WHICH_SHELL
+else
+  # Detect the shell from which the script was called
+  parent=$(ps -o comm $PPID 2>/dev/null |tail -1)
+  parent=${parent#-}  # remove the leading dash that login shells have
+  # Check if the parent shell is supported
+  case "$parent" in
+    bash|fish|xonsh|zsh)
+      shell=$parent
+      ;;
+    *)
+      # If parent shell is not supported (or there is no parent), check the current shell
+      parent=$(ps -o comm $$ |tail -1)
+      case "$current" in
+        bash|fish|xonsh|zsh)
+          shell=$current
+          ;;
+        *)
+          # If neither parent nor current shell is supported, use the login shell
+          shell=${SHELL##*/}
+          ;;
+      esac
+  esac
+fi
 
 # Parsing arguments
 if [ -t 0 ] ; then
