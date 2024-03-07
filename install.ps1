@@ -8,7 +8,7 @@ curl.exe -L -o micromamba.exe $RELEASE_URL
 
 New-Item -ItemType Directory -Force -Path  $Env:LocalAppData\micromamba | out-null
 
-$MAMBA_INSTALL_PATH = Join-Path -Path $Env:LocalAppData -ChildPAth micromamba\micromamba.exe
+$MAMBA_INSTALL_PATH = Join-Path -Path $Env:LocalAppData -ChildPath micromamba\micromamba.exe
 
 Write-Output "`nInstalling micromamba to $Env:LocalAppData\micromamba`n"
 Move-Item -Force micromamba.exe $MAMBA_INSTALL_PATH | out-null
@@ -40,5 +40,5 @@ if ($choice -eq "y" -or $choice -eq "Y" -or $choice -eq "") {
     Write-Output $MAMBA_INSTALL_PATH
     & $MAMBA_INSTALL_PATH shell init -s powershell -p $Env:UserProfile\micromamba
 } else {
-    Write-Output "`nYou can always initialize powershell pr cmd.exe with micromamba by running `nmicromamba shell init -s powershell -p $Env:UserProfile\micromamba`n"
+    Write-Output "`nYou can always initialize powershell or cmd.exe with micromamba by running `nmicromamba shell init -s powershell -p $Env:UserProfile\micromamba`n"
 }
