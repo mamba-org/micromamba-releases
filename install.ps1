@@ -36,7 +36,7 @@ if ($choice -eq "y" -or $choice -eq "Y" -or $choice -eq "") {
     }
 
     Write-Output "Initializing micromamba in  $prefix"
-    $MAMBA_INSTALL_PATH = Join-Path -Path $Env:LocalAppData -ChildPAth micromamba\micromamba.exe
+    $MAMBA_INSTALL_PATH = Join-Path -Path $Env:LocalAppData -ChildPath micromamba\micromamba.exe
     Write-Output $MAMBA_INSTALL_PATH
     & $MAMBA_INSTALL_PATH shell init -s powershell -p $prefix
 } else {
