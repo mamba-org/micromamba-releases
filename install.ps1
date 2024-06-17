@@ -40,5 +40,5 @@ if ($choice -eq "y" -or $choice -eq "Y" -or $choice -eq "") {
     Write-Output $MAMBA_INSTALL_PATH
     & $MAMBA_INSTALL_PATH shell init -s powershell -p $prefix
 } else {
-    Write-Output "`nYou can always initialize powershell pr cmd.exe with micromamba by running `nmicromamba shell init -s powershell -p $Env:UserProfile\micromamba`n"
+    Write-Output "`nYou can always initialize powershell or cmd.exe with micromamba by running `nmicromamba shell init -s powershell -p $Env:UserProfile\micromamba`n"
 }
