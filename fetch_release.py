@@ -29,7 +29,7 @@ def get_all_tags_github():
     return set(tags)
 
 
-def extract_with_microamamba(archive, outdir):
+def extract_with_micromamba(archive, outdir):
     subprocess.check_call(
         ["micromamba", "package", "extract", str(archive), str(outdir)]
     )
@@ -41,7 +41,7 @@ def set_output(name, value):
             print(f"{name}={value}\n", file=fh)
 
 
-def get_micromamba(version="latest"):
+def get_micromamba(version, use_default_version):
     url = f"https://api.anaconda.org/release/conda-forge/micromamba/{version}"
     existing_tags = get_all_tags_github()
     print("Getting Anaconda.org API")
@@ -60,7 +60,7 @@ def get_micromamba(version="latest"):
     assert len(all_versions) == 1
     version = all_versions.pop()
 
-    if (v := Version(version)).is_devrelease or v.is_prerelease:
+    if use_default_version and ((v := Version(version)).is_devrelease or v.is_prerelease):
         print(f"Skipping dev and pre releases version '{version}'")
         set_output("MICROMAMBA_NEW_VERSION", "false")
         return
@@ -108,7 +108,7 @@ def get_micromamba(version="latest"):
 
         # extract the file
         extract_dir = Path(f"micromamba-{version}-{build_number}-{dplat}")
-        extract_with_microamamba(dlloc, extract_dir)
+        extract_with_micromamba(dlloc, extract_dir)
 
         # move the file to the right place
         if dplat != "win-64":
@@ -142,6 +142,6 @@ def get_micromamba(version="latest"):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        get_micromamba(sys.argv[1])
+        get_micromamba(sys.argv[1], False)
     else:
-        get_micromamba()
+        get_micromamba("latest", True)
