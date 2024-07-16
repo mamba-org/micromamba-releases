@@ -31,19 +31,7 @@ jobs:
       if: steps.fetch-release.outputs.MICROMAMBA_NEW_VERSION == 'true'
       with:
         name: "micromamba ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}"
-        body: |
-          Release artifacts for micromamba ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}, mirrored from conda-forge.
-          The full changelog can be found [here](https://github.com/mamba-org/mamba/releases).
-        tag_name: ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}
-        files: |
-          releases/*
-
-    - name: Prerelease
-      uses: softprops/action-gh-release@v1
-      if: steps.fetch-release.outputs.MICROMAMBA_NEW_PRERELEASE == 'true'
-      with:
-        name: "micromamba ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}"
-        prerelease: true
+        prerelease: ${{ steps.fetch-release.outputs.MICROMAMBA_NEW_PRERELEASE == 'true' }}
         body: |
           Release artifacts for micromamba ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}, mirrored from conda-forge.
           The full changelog can be found [here](https://github.com/mamba-org/mamba/releases).
