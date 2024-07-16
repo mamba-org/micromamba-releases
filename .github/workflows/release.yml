@@ -3,8 +3,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to fetch, defaults to latest'
-        default: latest
+        description: 'Version to fetch, optional and defaults to latest'
+        required: false
 
   schedule:
     - cron: 0 */6 * * *
