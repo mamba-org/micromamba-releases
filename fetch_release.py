@@ -63,6 +63,7 @@ def get_micromamba(version, use_default_version):
     if use_default_version and ((v := Version(version)).is_devrelease or v.is_prerelease):
         print(f"Skipping dev and pre releases version '{version}'")
         set_output("MICROMAMBA_NEW_VERSION", "false")
+        set_output("MICROMAMBA_NEW_PRERELEASE", "false")
         return
 
     all_build = set([d["attrs"]["build_number"] for d in rj["distributions"]])
@@ -72,6 +73,7 @@ def get_micromamba(version, use_default_version):
     if f"{version}-{build}" in existing_tags:
         print("Tag already exists, skipping")
         set_output("MICROMAMBA_NEW_VERSION", "false")
+        set_output("MICROMAMBA_NEW_PRERELEASE", "false")
         return
 
     for d in rj["distributions"]:
@@ -136,7 +138,13 @@ def get_micromamba(version, use_default_version):
         with open(shafile, "w") as f:
             f.write(sha256.hexdigest())
 
-    set_output("MICROMAMBA_NEW_VERSION", "true")
+    if Version(version).is_prerelease:
+        set_output("MICROMAMBA_NEW_PRERELEASE", "true")
+        set_output("MICROMAMBA_NEW_VERSION", "false")
+    else:
+        set_output("MICROMAMBA_NEW_PRERELEASE", "false")
+        set_output("MICROMAMBA_NEW_VERSION", "true")
+
     set_output("MICROMAMBA_VERSION", f"{version}-{build_number}")
 
 
