@@ -136,6 +136,11 @@ def get_micromamba(version, use_default_version):
         with open(shafile, "w") as f:
             f.write(sha256.hexdigest())
 
+    if (v := Version(version)).is_devrelease or v.is_prerelease:
+        set_output("MICROMAMBA_NEW_PRERELEASE", "true")
+    else:
+        set_output("MICROMAMBA_NEW_PRERELEASE", "false")
+
     set_output("MICROMAMBA_NEW_VERSION", "true")
     set_output("MICROMAMBA_VERSION", f"{version}-{build_number}")
 

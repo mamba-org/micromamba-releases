@@ -31,6 +31,7 @@ jobs:
       if: steps.fetch-release.outputs.MICROMAMBA_NEW_VERSION == 'true'
       with:
         name: "micromamba ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}"
+        prerelease: ${{ steps.fetch-release.outputs.MICROMAMBA_NEW_PRERELEASE == 'true' }}
         body: |
           Release artifacts for micromamba ${{ steps.fetch-release.outputs.MICROMAMBA_VERSION }}, mirrored from conda-forge.
           The full changelog can be found [here](https://github.com/mamba-org/mamba/releases).
