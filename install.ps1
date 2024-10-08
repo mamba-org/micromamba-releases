@@ -1,7 +1,9 @@
 # check if VERSION env variable is set, otherwise use "latest"
-$VERSION = if ($null -eq $Env:VERSION) { "latest" } else { $Env:VERSION }
-
-$RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/$VERSION/download/micromamba-win-64"
+$RELEASE_URL = if ($null -eq $Env:VERSION) {
+    "https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-win-64"
+} else {
+    "https://github.com/mamba-org/micromamba-releases/releases/download/$Env:VERSION/micromamba-win-64"
+}
 
 Write-Output "Downloading micromamba from $RELEASE_URL"
 curl.exe -L -o micromamba.exe $RELEASE_URL
