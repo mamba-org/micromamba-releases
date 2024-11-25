@@ -10,7 +10,7 @@ curl.exe -L -o micromamba.exe $RELEASE_URL
 
 New-Item -ItemType Directory -Force -Path  $Env:LocalAppData\micromamba | out-null
 
-$MAMBA_INSTALL_PATH = Join-Path -Path $Env:LocalAppData -ChildPAth micromamba\micromamba.exe
+$MAMBA_INSTALL_PATH = Join-Path -Path $Env:LocalAppData -ChildPath micromamba\micromamba.exe
 
 Write-Output "`nInstalling micromamba to $Env:LocalAppData\micromamba`n"
 Move-Item -Force micromamba.exe $MAMBA_INSTALL_PATH | out-null
