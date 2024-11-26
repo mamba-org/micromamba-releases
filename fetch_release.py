@@ -121,6 +121,12 @@ def get_micromamba(version, use_default_version):
 
         outfile = outdir / f"micromamba-{dplat}"
         shutil.copyfile(binary, outfile)
+
+        # On Windows, we need to add the .exe extension explicitly
+        # so that the file is recognized as an executable.
+        if dplat == "win-64":
+            shutil.copyfile(binary, outdir / f"micromamba-{dplat}.exe")
+
         shutil.copyfile(dlloc, outdir / f"micromamba-{dplat}{ext}")
 
         # compute the sha256
