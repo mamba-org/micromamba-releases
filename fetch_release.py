@@ -60,7 +60,10 @@ def get_micromamba(version, use_default_version):
     assert len(all_versions) == 1
     version = all_versions.pop()
 
-    if use_default_version and ((v := Version(version)).is_devrelease or v.is_prerelease):
+    v = Version(version)
+    is_stable = not (v.is_devrelease or v.is_prerelease)
+
+    if use_default_version and not is_stable:
         print(f"Skipping dev and pre releases version '{version}'")
         set_output("MICROMAMBA_NEW_VERSION", "false")
         return
@@ -142,10 +145,15 @@ def get_micromamba(version, use_default_version):
         with open(shafile, "w") as f:
             f.write(sha256.hexdigest())
 
-    if (v := Version(version)).is_devrelease or v.is_prerelease:
-        set_output("MICROMAMBA_NEW_PRERELEASE", "true")
-    else:
+    if is_stable:
         set_output("MICROMAMBA_NEW_PRERELEASE", "false")
+    else:
+        set_output("MICROMAMBA_NEW_PRERELEASE", "true")
+
+    if is_stable and v.major == 2:
+        set_output("MICROMAMBA_LATEST", "true")
+    else:
+        set_output("MICROMAMBA_LATEST", "false")
 
     set_output("MICROMAMBA_NEW_VERSION", "true")
     set_output("MICROMAMBA_VERSION", f"{version}-{build_number}")
