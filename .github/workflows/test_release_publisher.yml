@@ -31,4 +31,5 @@ jobs:
         body: |
           Fake release for micromamba
         tag_name: ${{ env.MICROMAMBA_VERSION }}
-        files: releases/*
+        files: |
+          releases/*
