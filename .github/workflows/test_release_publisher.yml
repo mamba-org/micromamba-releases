@@ -1,0 +1,34 @@
+name: "Test Release Publisher"
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test_release_publisher:
+    runs-on: ubuntu-latest 
+    steps:
+    - uses: actions/checkout@v3
+    
+    # Simulate the `fetch_release.py` script output by directly setting environment variables
+    - name: Mock fetch-release outputs
+      run: |
+        echo "MICROMAMBA_NEW_VERSION=true" >> $GITHUB_ENV
+        echo "MICROMAMBA_VERSION=1.1.0" >> $GITHUB_ENV
+        echo "MICROMAMBA_NEW_PRERELEASE=false" >> $GITHUB_ENV
+        echo "MICROMAMBA_LATEST=false" >> $GITHUB_ENV
+
+    - name: Fake GitHub release
+      uses: softprops/action-gh-release@v2
+      if: env.MICROMAMBA_NEW_VERSION == 'true'
+      with:
+        name: Fake release
+        # Set 'draft' to true for testing
+        draft: true
+        prerelease: ${{ env.MICROMAMBA_NEW_PRERELEASE == 'true' }}
+        make_latest: ${{ env.MICROMAMBA_LATEST }}
+        body: |
+          Fake release for micromamba
+        tag_name: ${{ env.MICROMAMBA_VERSION }}
+        files: releases/*
