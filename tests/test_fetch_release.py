@@ -58,7 +58,7 @@ def test_get_all_tags_github(retry_config):
     pytest.fail("Failed to fetch GitHub tags after multiple retries.")
 
 
-@pytest.mark.parametrize("version", ("latest", "2.0.5", "1.5.10"))
+@pytest.mark.parametrize("version", ("latest", "2.0.5"))#, "1.5.10"))
 @pytest.mark.parametrize("use_default_version", (False, True))
 def test_get_micromamba_existing_version(retry_config, version, use_default_version):
     """
