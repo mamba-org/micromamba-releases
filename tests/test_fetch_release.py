@@ -71,9 +71,9 @@ def test_get_micromamba_existing_version(retry_config, version, use_default_vers
         try:
             get_micromamba(version, use_default_version)
             assert get_output_value("MICROMAMBA_NEW_VERSION") == "false"
-            assert os.environ["MICROMAMBA_NEW_PRERELEASE"] == None
-            assert os.environ["MICROMAMBA_LATEST"] == None
-            assert os.environ["MICROMAMBA_VERSION"] == None
+            assert get_output_value("MICROMAMBA_NEW_PRERELEASE") == None
+            assert get_output_value("MICROMAMBA_LATEST") == None
+            assert get_output_value("MICROMAMBA_VERSION") == None
             print(f"Fetched micromamba release {version} successfully.")
             return
         except requests.exceptions.RequestException as e:
@@ -95,9 +95,9 @@ def test_get_micromamba_existing_dev_or_prerelease(retry_config, version):
         try:
             get_micromamba(version, use_default_version = True)
             assert get_output_value("MICROMAMBA_NEW_VERSION") == "false"
-            assert os.environ["MICROMAMBA_NEW_PRERELEASE"] == None
-            assert os.environ["MICROMAMBA_LATEST"] == None
-            assert os.environ["MICROMAMBA_VERSION"] == None
+            assert get_output_value("MICROMAMBA_NEW_PRERELEASE") == None
+            assert get_output_value("MICROMAMBA_LATEST") == None
+            assert get_output_value("MICROMAMBA_VERSION") == None
             print(f"Fetched micromamba release {version} successfully.")
             return
         except requests.exceptions.RequestException as e:
@@ -119,9 +119,9 @@ def test_get_micromamba_non_existing_stable_version(retry_config, version, use_d
         try:
             get_micromamba(version, use_default_version = True)
             assert get_output_value("MICROMAMBA_NEW_VERSION") == "true"
-            assert os.environ["MICROMAMBA_NEW_PRERELEASE"] == "false"
-            assert os.environ["MICROMAMBA_LATEST"] == "true"
-            #assert os.environ["MICROMAMBA_VERSION"] == ""
+            assert get_output_value("MICROMAMBA_NEW_PRERELEASE") == "false"
+            assert get_output_value("MICROMAMBA_LATEST") == "true"
+            #assert get_output_value("MICROMAMBA_VERSION") == ""
             print(f"Fetched micromamba release {version} successfully.")
             return
         except requests.exceptions.RequestException as e:
