@@ -1,19 +1,19 @@
-#name: "Test Release Publisher"
+name: "Test Release Publisher"
 
-#on:
-  #pull_request:
-    #branches:
-      #- main
+on:
+  pull_request:
+    branches:
+      - main
 
-#jobs:
-  #test_release_publisher:
-    #runs-on: ubuntu-latest
-    #steps:
-    #- uses: actions/checkout@v3
+jobs:
+  test_release_publisher:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
     
-    ## Simulate the `fetch_release.py` script outputs by directly setting environment variables
-    #- name: Mock fetch-release outputs
-      ## TODO Parametrize all these and check results
+    # Simulate the `fetch_release.py` script outputs by directly setting environment variables
+    - name: Mock fetch-release outputs
+      # TODO Parametrize all these and check results
       #run: |
         #echo "MICROMAMBA_NEW_VERSION=true" >> $GITHUB_ENV
         #echo "MICROMAMBA_VERSION=1.1.0" >> $GITHUB_ENV

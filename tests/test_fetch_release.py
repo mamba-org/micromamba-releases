@@ -58,22 +58,22 @@ def test_get_all_tags_github(retry_config):
     pytest.fail("Failed to fetch GitHub tags after multiple retries.")
 
 
-def test_get_micromamba(retry_config):
+@pytest.mark.parametrize("version", ("latest", "2.0.5", "1.5.10"))
+@pytest.mark.parametrize("use_default_version", (False, True))
+def test_get_micromamba_existing_version(retry_config, version, use_default_version):
     """
-    Test fetching micromamba release info from Anaconda API.
+    Test fetching existing micromamba stable version.
     """
-    # TODO use other values of version
-    version = "latest" # some_valid_version_2 some_valid_version_1 invalid version
     max_retries = retry_config['max_retries']
     retry_delay = retry_config['retry_delay']
 
     for _ in range(max_retries):
         try:
-            get_micromamba(version, use_default_version=False)
+            get_micromamba(version, use_default_version)
             assert get_output_value("MICROMAMBA_NEW_VERSION") == "false"
-            #assert os.environ["MICROMAMBA_NEW_PRERELEASE"] == "true"
-            #assert os.environ["MICROMAMBA_LATEST"] == "true"
-            #assert os.environ["MICROMAMBA_VERSION"] == "true"
+            assert os.environ["MICROMAMBA_NEW_PRERELEASE"] == None
+            assert os.environ["MICROMAMBA_LATEST"] == None
+            assert os.environ["MICROMAMBA_VERSION"] == None
             print(f"Fetched micromamba release {version} successfully.")
             return
         except requests.exceptions.RequestException as e:
@@ -82,6 +82,53 @@ def test_get_micromamba(retry_config):
 
     pytest.fail(f"Failed to fetch micromamba release info after multiple retries.")
 
+#TODO add a test with use_default_version = False
+@pytest.mark.parametrize("version", ("2.0.5.rc0", "2.0.4alpha1"))
+def test_get_micromamba_existing_dev_or_prerelease(retry_config, version):
+    """
+    Test fetching existing micromamba dev or prerelease version.
+    """
+    max_retries = retry_config['max_retries']
+    retry_delay = retry_config['retry_delay']
+
+    for _ in range(max_retries):
+        try:
+            get_micromamba(version, use_default_version = True)
+            assert get_output_value("MICROMAMBA_NEW_VERSION") == "false"
+            assert os.environ["MICROMAMBA_NEW_PRERELEASE"] == None
+            assert os.environ["MICROMAMBA_LATEST"] == None
+            assert os.environ["MICROMAMBA_VERSION"] == None
+            print(f"Fetched micromamba release {version} successfully.")
+            return
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching micromamba release, retrying... {e}")
+            time.sleep(retry_delay)
+
+    pytest.fail(f"Failed to fetch micromamba release info after multiple retries.")
+
+@pytest.mark.parametrize("version", ("999.44.6"))
+@pytest.mark.parametrize("use_default_version", (False, True))
+def test_get_micromamba_non_existing_stable_version(retry_config, version, use_default_version):
+    """
+    Test fetching non existing micromamba stable version.
+    """
+    max_retries = retry_config['max_retries']
+    retry_delay = retry_config['retry_delay']
+
+    for _ in range(max_retries):
+        try:
+            get_micromamba(version, use_default_version = True)
+            assert get_output_value("MICROMAMBA_NEW_VERSION") == "true"
+            assert os.environ["MICROMAMBA_NEW_PRERELEASE"] == "false"
+            assert os.environ["MICROMAMBA_LATEST"] == "true"
+            #assert os.environ["MICROMAMBA_VERSION"] == ""
+            print(f"Fetched micromamba release {version} successfully.")
+            return
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching micromamba release, retrying... {e}")
+            time.sleep(retry_delay)
+
+    pytest.fail(f"Failed to fetch micromamba release info after multiple retries.")
 
 #def test_get_micromamba_default_version(retry_config):
     #"""

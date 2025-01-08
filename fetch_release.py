@@ -150,7 +150,7 @@ def get_micromamba(version, use_default_version):
     else:
         set_output("MICROMAMBA_NEW_PRERELEASE", "true")
 
-    if is_stable and v.major == 2:
+    if is_stable and v.major >= 2:
         set_output("MICROMAMBA_LATEST", "true")
     else:
         set_output("MICROMAMBA_LATEST", "false")
