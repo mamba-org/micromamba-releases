@@ -1,0 +1,23 @@
+name: "Test fetching releases from Anaconda"
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test_fetch_release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mamba-org/setup-micromamba@v1
+      with:
+        environment-file: environment.yml
+    - name: Add micromamba to GITHUB_PATH
+      run: echo "${HOME}/micromamba-bin" >> "$GITHUB_PATH"
+
+    - shell: bash -l {0}
+      id: fetch-release
+      run: |
+        python -m pip install packaging pytest
+        python -m pytest tests/test_fetch_release.py -v --exitfirst
