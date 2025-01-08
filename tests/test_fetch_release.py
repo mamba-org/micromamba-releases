@@ -112,8 +112,8 @@ def test_get_micromamba_non_existing_version(use_default_version):
     Test fetching non existing micromamba version.
     """
 
-    #with pytest.raises():
-    get_micromamba("9.10.5", use_default_version)
+    with pytest.raises(requests.exceptions.HTTPError):
+        get_micromamba("9.10.5", use_default_version)
 
 
 #def test_get_micromamba_default_version(retry_config):
