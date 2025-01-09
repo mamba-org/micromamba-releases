@@ -182,8 +182,20 @@ def test_get_micromamba_new_2_x_version(mock_get, mock_check_call, mock_copyfile
 
     # Mock subprocess.check_call to prevent actual command execution
     mock_check_call.return_value = None  # Simulate a successful call
+
     # Mock shutil.copyfile to prevent file copying
-    mock_copyfile.return_value = None  # Simulate successful copy
+    #mock_copyfile.return_value = None  # Simulate successful copy
+    # Mock shutil.copyfile to simulate copying a valid file
+    def mock_copyfile_side_effect(src, dst, follow_symlinks=True):
+        # Simulate that the source file exists
+        # TODO use different versions and subdirs
+        if src == 'micromamba-10.11.12-1-linux-64/bin/micromamba':
+            # Simulate successful copy operation
+            assert dst == 'releases/micromamba-linux-64'
+        else:
+            raise FileNotFoundError(f"File {src} not found")
+
+    mock_copyfile.side_effect = mock_copyfile_side_effect
 
     # Mock existing GitHub tags to simulate the version already being tagged
     with patch.object(fetch_release, 'get_all_tags_github', return_value={'2.0.5-0'}):
