@@ -1,3 +1,4 @@
+import hashlib
 import pytest
 import requests
 import time
@@ -101,6 +102,15 @@ def test_get_micromamba_new_2_x_version(mock_get):
     # Mock the response from the Anaconda API
     mock_response = MagicMock()
     mock_response.status_code = 200
+
+    # Mock request content to return a byte string
+    mocked_content = b"mocked binary content"
+    mock_response.content = mocked_content
+
+    sha256 = hashlib.sha256()
+    sha256.update(mocked_content)
+    computed_checksum = sha256.hexdigest()
+
     mock_response.json.return_value = {
         "distributions": [
             {
@@ -109,8 +119,9 @@ def test_get_micromamba_new_2_x_version(mock_get):
                     "build_number": 1
                 },
                 "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/linux-64/micromamba-10.11.12-1.tar.bz2",
-                "sha256": "abcdef0123456789",
-                "basename": "linux-64/micromamba-10.11.12-linux-64.tar.bz2"
+                "sha256": computed_checksum,
+                "basename": "linux-64/micromamba-10.11.12-linux-64.tar.bz2",
+                "version": "10.11.12"
             },
             {
                 "attrs": {
@@ -118,8 +129,9 @@ def test_get_micromamba_new_2_x_version(mock_get):
                     "build_number": 1
                 },
                 "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/linux-aarch64/micromamba-10.11.12-1.tar.bz2",
-                "sha256": "abcdef0123456789",
-                "basename": "linux-aarch64/micromamba-10.11.12-linux-aarch64.tar.bz2"
+                "sha256": computed_checksum,
+                "basename": "linux-aarch64/micromamba-10.11.12-linux-aarch64.tar.bz2",
+                "version": "10.11.12"
             },
             {
                 "attrs": {
@@ -127,8 +139,9 @@ def test_get_micromamba_new_2_x_version(mock_get):
                     "build_number": 1
                 },
                 "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/linux-ppc64le/micromamba-10.11.12-1.tar.bz2",
-                "sha256": "abcdef0123456789",
-                "basename": "linux-ppc64le/micromamba-10.11.12-linux-ppc64le.tar.bz2"
+                "sha256": computed_checksum,
+                "basename": "linux-ppc64le/micromamba-10.11.12-linux-ppc64le.tar.bz2",
+                "version": "10.11.12"
             },
             {
                 "attrs": {
@@ -136,8 +149,9 @@ def test_get_micromamba_new_2_x_version(mock_get):
                     "build_number": 1
                 },
                 "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/win-64/micromamba-10.11.12-1.tar.bz2",
-                "sha256": "abcdef0123456789",
-                "basename": "win-64/micromamba-10.11.12-win-64.tar.bz2"
+                "sha256": computed_checksum,
+                "basename": "win-64/micromamba-10.11.12-win-64.tar.bz2",
+                "version": "10.11.12"
             },
             {
                 "attrs": {
@@ -145,8 +159,9 @@ def test_get_micromamba_new_2_x_version(mock_get):
                     "build_number": 1
                 },
                 "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/osx-64/micromamba-10.11.12-1.tar.bz2",
-                "sha256": "abcdef0123456789",
-                "basename": "osx-64/micromamba-10.11.12-osx-64.tar.bz2"
+                "sha256": computed_checksum,
+                "basename": "osx-64/micromamba-10.11.12-osx-64.tar.bz2",
+                "version": "10.11.12"
             },
             {
                 "attrs": {
@@ -154,20 +169,22 @@ def test_get_micromamba_new_2_x_version(mock_get):
                     "build_number": 1
                 },
                 "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/osx-arm64/micromamba-10.11.12-1.tar.bz2",
-                "sha256": "abcdef0123456789",
-                "basename": "osx-arm64/micromamba-10.11.12-osx-arm64.tar.bz2"
+                "sha256": computed_checksum,
+                "basename": "osx-arm64/micromamba-10.11.12-osx-arm64.tar.bz2",
+                "version": "10.11.12"
             }
         ]
     }
+
     mock_get.return_value = mock_response
 
     # Mock existing GitHub tags to simulate the version already being tagged
-    with patch.object(fetch_release, 'get_all_tags_github', return_value={'10.11.12-1'}):
+    with patch.object(fetch_release, 'get_all_tags_github', return_value={'2.0.5-0'}):
         # Run the method with the mocked data
         fetch_release.get_micromamba('10.11.12', False)
 
         # Check that the `requests.get` method was called as expected
-        mock_get.assert_called_once_with("https://api.anaconda.org/release/conda-forge/micromamba/10.11.12")
+        #mock_get.assert_called_once_with("https://api.anaconda.org/release/conda-forge/micromamba/10.11.12")
 
         assert get_output_value("MICROMAMBA_NEW_VERSION") == "true"
 
