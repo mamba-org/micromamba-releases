@@ -82,9 +82,9 @@ def test_get_micromamba_existing_version(retry_config, version, use_default_vers
 
     pytest.fail(f"Failed to fetch micromamba release info after multiple retries.")
 
-@pytest.mark.parametrize("version", ("1.5.11"))
+#@pytest.mark.parametrize("version", ("1.5.10"))
 @pytest.mark.parametrize("use_default_version", (False, True))
-def test_get_micromamba_existing_1_x(retry_config, version, use_default_version):
+def test_get_micromamba_existing_1_x(retry_config, use_default_version):
     """
     Test fetching existing micromamba dev or prerelease version.
     """
@@ -93,6 +93,7 @@ def test_get_micromamba_existing_1_x(retry_config, version, use_default_version)
 
     for _ in range(max_retries):
         try:
+            version = "1.5.10";
             get_micromamba(version, use_default_version)
             assert get_output_value("MICROMAMBA_NEW_VERSION") == "false"
             assert get_output_value("MICROMAMBA_NEW_PRERELEASE") == None
