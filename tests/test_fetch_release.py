@@ -98,13 +98,14 @@ def test_get_micromamba_non_existing_version(use_default_version):
 #TODO mock test for non existing versions => new_version_1_x, new_version_2_x, new_prerelease
 
 @patch('fetch_release.requests.get')
-def test_get_micromamba_new_2_x_version(mock_get):
+@patch("subprocess.check_call")
+def test_get_micromamba_new_2_x_version(mock_check_call, mock_get):
     # Mock the response from the Anaconda API
     mock_response = MagicMock()
     mock_response.status_code = 200
 
     # Mock request content to return a byte string
-    mocked_content = b"mocked binary content"
+    mocked_content = b"some random binary data representing a tar.bz2 file"
     mock_response.content = mocked_content
 
     sha256 = hashlib.sha256()
@@ -178,6 +179,9 @@ def test_get_micromamba_new_2_x_version(mock_get):
 
     mock_get.return_value = mock_response
 
+    # Mock subprocess.check_call to prevent actual command execution
+    mock_check_call.return_value = None  # Simulate a successful call
+
     # Mock existing GitHub tags to simulate the version already being tagged
     with patch.object(fetch_release, 'get_all_tags_github', return_value={'2.0.5-0'}):
         # Run the method with the mocked data
@@ -185,6 +189,10 @@ def test_get_micromamba_new_2_x_version(mock_get):
 
         # Check that the `requests.get` method was called as expected
         #mock_get.assert_called_once_with("https://api.anaconda.org/release/conda-forge/micromamba/10.11.12")
+
+        # Ensure that subprocess.check_call was called to extract the archive
+        #mock_check_call.assert_called_once_with(
+            ["micromamba", "package", "extract", "micromamba-10.11.12-1-linux-64.tar.bz2", "micromamba-10.11.12-1-linux-64"])
 
         assert get_output_value("MICROMAMBA_NEW_VERSION") == "true"
 
