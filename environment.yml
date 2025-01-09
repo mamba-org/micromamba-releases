@@ -2,6 +2,7 @@ name: fetch-release-env
 channels:
   - conda-forge
 dependencies:
+  - packaging
   - python
   - requests
   - rich
