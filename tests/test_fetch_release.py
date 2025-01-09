@@ -103,6 +103,7 @@ def test_get_micromamba_non_existing_version(use_default_version):
 def test_get_micromamba_new_2_x_version(mock_get, mock_check_call, mock_copyfile):
     # Mock the response from the Anaconda API
     mock_response = MagicMock()
+    mock_response.raise_for_status = MagicMock()  # Mock the raise_for_status method
     mock_response.status_code = 200
 
     # Mock request content to return a byte string
