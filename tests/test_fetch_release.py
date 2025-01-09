@@ -108,9 +108,54 @@ def test_get_micromamba_new_2_x_version(mock_get):
                     "subdir": "linux-64",
                     "build_number": 1
                 },
-                "download_url": "https://example.com/micromamba.tar.bz2",
+                "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/linux-64/micromamba-10.11.12-1.tar.bz2",
                 "sha256": "abcdef0123456789",
-                "basename": "micromamba-10.11.12-linux-64.tar.bz2"
+                "basename": "linux-64/micromamba-10.11.12-linux-64.tar.bz2"
+            }
+            {
+                "attrs": {
+                    "subdir": "linux-aarch64",
+                    "build_number": 1
+                },
+                "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/linux-aarch64/micromamba-10.11.12-1.tar.bz2",
+                "sha256": "abcdef0123456789",
+                "basename": "linux-aarch64/micromamba-10.11.12-linux-aarch64.tar.bz2"
+            }
+            {
+                "attrs": {
+                    "subdir": "linux-ppc64le",
+                    "build_number": 1
+                },
+                "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/linux-ppc64le/micromamba-10.11.12-1.tar.bz2",
+                "sha256": "abcdef0123456789",
+                "basename": "linux-ppc64le/micromamba-10.11.12-linux-ppc64le.tar.bz2"
+            }
+            {
+                "attrs": {
+                    "subdir": "win-64",
+                    "build_number": 1
+                },
+                "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/win-64/micromamba-10.11.12-1.tar.bz2",
+                "sha256": "abcdef0123456789",
+                "basename": "win-64/micromamba-10.11.12-win-64.tar.bz2"
+            }
+            {
+                "attrs": {
+                    "subdir": "osx-64",
+                    "build_number": 1
+                },
+                "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/osx-64/micromamba-10.11.12-1.tar.bz2",
+                "sha256": "abcdef0123456789",
+                "basename": "osx-64/micromamba-10.11.12-osx-64.tar.bz2"
+            }
+            {
+                "attrs": {
+                    "subdir": "osx-arm64",
+                    "build_number": 1
+                },
+                "download_url": "https://anaconda-api/conda-forge/micromamba/10.11.12/osx-arm64/micromamba-10.11.12-1.tar.bz2",
+                "sha256": "abcdef0123456789",
+                "basename": "osx-arm64/micromamba-10.11.12-osx-arm64.tar.bz2"
             }
         ]
     }
