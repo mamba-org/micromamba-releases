@@ -2,13 +2,16 @@ import pytest
 import requests
 import time
 
+from unittest.mock import patch, MagicMock
+
+
 # TODO do this more elegantly?
 # Put fetch_release in a py folder for example?
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from fetch_release import get_all_tags_github, get_micromamba
+import fetch_release
 
 @pytest.fixture(scope="module")
 def retry_config():
@@ -43,7 +46,7 @@ def test_get_all_tags_github(retry_config):
 
     for _ in range(max_retries):
         try:
-            tags = get_all_tags_github()
+            tags = fetch_release.get_all_tags_github()
             # Tags list for a minimal tags check
             tags_to_check = ["2.0.5-0", "2.0.5.rc0-0", "1.5.12-0"]
             assert isinstance(tags, set)
@@ -69,7 +72,7 @@ def test_get_micromamba_existing_version(retry_config, version, use_default_vers
 
     for _ in range(max_retries):
         try:
-            get_micromamba(version, use_default_version)
+            fetch_release.get_micromamba(version, use_default_version)
             assert get_output_value("MICROMAMBA_NEW_VERSION") == "false"
             assert get_output_value("MICROMAMBA_NEW_PRERELEASE") == None
             assert get_output_value("MICROMAMBA_LATEST") == None
@@ -89,8 +92,39 @@ def test_get_micromamba_non_existing_version(use_default_version):
     """
 
     with pytest.raises(requests.exceptions.HTTPError):
-        get_micromamba("9.10.5", use_default_version)
+        fetch_release.get_micromamba("9.10.5", use_default_version)
 
-#TODO mock test for non existing versions => new
+#TODO mock test for non existing versions => new_version_1_x, new_version_2_x, new_prerelease
+
+@patch('fetch_release.requests.get')
+def test_get_micromamba_new_2_x_version(mock_get):
+    # Mock the response from the Anaconda API
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "distributions": [
+            {
+                "attrs": {
+                    "subdir": "linux-64",
+                    "build_number": 1
+                },
+                "download_url": "https://example.com/micromamba.tar.bz2",
+                "sha256": "abcdef0123456789",
+                "basename": "micromamba-10.11.12-linux-64.tar.bz2"
+            }
+        ]
+    }
+    mock_get.return_value = mock_response
+
+    # Mock existing GitHub tags to simulate the version already being tagged
+    with patch.object(fetch_release, 'get_all_tags_github', return_value={'10.11.12-1'}):
+        # Run the method with the mocked data
+        fetch_release.get_micromamba('10.11.12', False)
+
+        # Check that the `requests.get` method was called as expected
+        mock_get.assert_called_once_with("https://api.anaconda.org/release/conda-forge/micromamba/10.11.12")
+
+        assert get_output_value("MICROMAMBA_NEW_VERSION") == "true"
+
 
 
