@@ -192,7 +192,7 @@ def test_get_micromamba_new_2_x_version(mock_check_call, mock_get):
 
         # Ensure that subprocess.check_call was called to extract the archive
         #mock_check_call.assert_called_once_with(
-            ["micromamba", "package", "extract", "micromamba-10.11.12-1-linux-64.tar.bz2", "micromamba-10.11.12-1-linux-64"])
+            #["micromamba", "package", "extract", "micromamba-10.11.12-1-linux-64.tar.bz2", "micromamba-10.11.12-1-linux-64"])
 
         assert get_output_value("MICROMAMBA_NEW_VERSION") == "true"
 
