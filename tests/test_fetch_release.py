@@ -93,7 +93,7 @@ def test_get_micromamba_existing_1_x(retry_config, use_default_version):
 
     for _ in range(max_retries):
         try:
-            version = "1.5.10";
+            version = "1.5.9";
             get_micromamba(version, use_default_version)
             assert get_output_value("MICROMAMBA_NEW_VERSION") == "false"
             assert get_output_value("MICROMAMBA_NEW_PRERELEASE") == None
