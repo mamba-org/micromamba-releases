@@ -203,6 +203,19 @@ def test_get_micromamba_new_2_x_version(mock_get, mock_check_call, mock_copyfile
         fetch_release.get_micromamba('10.11.12', False)
 
         # Check that the `requests.get` method was called as expected
+        mock_get.assert_called_once_with("https://api.anaconda.org/release/conda-forge/micromamba/10.11.12")
+
+        # Ensure that subprocess.check_call was called to extract the archive
+        mock_check_call.assert_called_once_with(
+            ["micromamba", "package", "extract", "micromamba-10.11.12-1-linux-64.tar.bz2", "micromamba-10.11.12-1-linux-64"])
+
+        # Ensure shutil.copyfile is called with the expected paths
+        mock_copyfile.assert_called_once_with(
+            'micromamba-10.11.12-1-linux-64/bin/micromamba', 'releases/micromamba-linux-64'
+        )
+
+
+        # Check that the `requests.get` method was called as expected
         #mock_get.assert_called_once_with("https://api.anaconda.org/release/conda-forge/micromamba/10.11.12")
 
         # Ensure that subprocess.check_call was called to extract the archive
