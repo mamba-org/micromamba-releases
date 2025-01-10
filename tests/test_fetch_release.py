@@ -97,9 +97,9 @@ def test_get_micromamba_non_existing_version(use_default_version):
 
 #TODO mock test for non existing versions => new_version_1_x, new_version_2_x, new_prerelease
 
-@patch('fetch_release.requests.get') # TODO remove fetch_release?
-@patch("fetch_release.subprocess.check_call")
-@patch("fetch_release.shutil.copyfile")
+@patch('requests.get') # TODO remove fetch_release?
+@patch("subprocess.check_call")
+@patch("shutil.copyfile")
 def test_get_micromamba_new_2_x_version(mock_get, mock_check_call, mock_copyfile):
     # Mock the response from the Anaconda API
     mock_response = MagicMock()
@@ -186,7 +186,7 @@ def test_get_micromamba_new_2_x_version(mock_get, mock_check_call, mock_copyfile
     # Mock shutil.copyfile to prevent file copying
     #mock_copyfile.return_value = None  # Simulate successful copy
     # Mock shutil.copyfile to simulate copying a valid file
-    def mock_copyfile_side_effect(src, dst, follow_symlinks=True):
+    def mock_copyfile_side_effect(src, dst): #, follow_symlinks=True):
         # Simulate that the source file exists
         # TODO use different versions and subdirs
         if src == 'micromamba-10.11.12-1-linux-64/bin/micromamba':
