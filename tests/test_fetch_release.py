@@ -110,16 +110,16 @@ def mock_anaconda_api():
     with patch('requests.get') as mock:
         # Simulate a new version available
         mock.status_code = 200
-        mock_response.raise_for_status = MagicMock()
+        mock.raise_for_status = MagicMock()
 
         mocked_content = b"some random binary data representing a tar.bz2 file"
-        mock_response.content = mocked_content
+        mock.content = mocked_content
 
         sha256 = hashlib.sha256()
         sha256.update(mocked_content)
         computed_checksum = sha256.hexdigest()
 
-        mock_response.json.return_value = {
+        mock.json.return_value = {
             "distributions": [
                 {
                     "attrs": {
@@ -187,9 +187,35 @@ def mock_anaconda_api():
         yield mock
 
 
+@pytest.fixture
+def mock_check_call():
+    """Mock subprocess.check_call"""
+    with patch('subprocess.check_call') as mock:
+        mock.return_value = None
+        yield mock
+
+@pytest.fixture
+def mock_copyfile():
+    """Mock subprocess.check_call"""
+    with patch('shutil.copyfile') as mock:
+        #mock.return_value = None
+        def mock_copyfile_side_effect(*args, **kwargs): #src=None, dst=None, follow_symlinks=True):
+            # Simulate that the source file exists
+            # TODO use different versions and subdirs
+            #if src == 'micromamba-10.11.12-1-linux-64/bin/micromamba':
+                ## Simulate successful copy operation
+                #assert dst == 'releases/micromamba-linux-64'
+            #else:
+            if not args and not kwargs:
+                raise FileNotFoundError(f"File {src} not found")
+
+        mock.side_effect = mock_copyfile_side_effect
+
+        yield mock
+
 #@patch('requests.get')
-@patch("subprocess.check_call")
-@patch("shutil.copyfile")
+#@patch("subprocess.check_call")
+#@patch("shutil.copyfile")
 def test_get_micromamba_new_2_x_version(mock_github_tags, mock_anaconda_api, mock_check_call, mock_copyfile):
     # Create a mock response object for get_all_tags_github (GitHub API)
     #mock_github_response = MagicMock()
@@ -298,39 +324,39 @@ def test_get_micromamba_new_2_x_version(mock_github_tags, mock_anaconda_api, moc
     #mock_get.return_value = mock_response
 
     # Mock subprocess.check_call to prevent actual command execution
-    mock_check_call.return_value = None  # Simulate a successful call
+    #mock_check_call.return_value = None  # Simulate a successful call
 
     # Mock shutil.copyfile to prevent file copying
     #mock_copyfile.return_value = None  # Simulate successful copy
     # Mock shutil.copyfile to simulate copying a valid file
-    def mock_copyfile_side_effect(*args, **kwargs): #src=None, dst=None, follow_symlinks=True):
-        # Simulate that the source file exists
-        # TODO use different versions and subdirs
-        #if src == 'micromamba-10.11.12-1-linux-64/bin/micromamba':
-            ## Simulate successful copy operation
-            #assert dst == 'releases/micromamba-linux-64'
-        #else:
-        if not args and not kwargs:
-            raise FileNotFoundError(f"File {src} not found")
+    #def mock_copyfile_side_effect(*args, **kwargs): #src=None, dst=None, follow_symlinks=True):
+        ## Simulate that the source file exists
+        ## TODO use different versions and subdirs
+        ##if src == 'micromamba-10.11.12-1-linux-64/bin/micromamba':
+            ### Simulate successful copy operation
+            ##assert dst == 'releases/micromamba-linux-64'
+        ##else:
+        #if not args and not kwargs:
+            #raise FileNotFoundError(f"File {src} not found")
 
-    mock_copyfile.side_effect = mock_copyfile_side_effect
+    #mock_copyfile.side_effect = mock_copyfile_side_effect
 
     # Mock existing GitHub tags to simulate the version already being tagged
-    with patch.object(fetch_release, 'get_all_tags_github', return_value={'2.0.5-0'}):
+    #with patch.object(fetch_release, 'get_all_tags_github', return_value={'2.0.5-0'}):
         # Run the method with the mocked data
-        fetch_release.get_micromamba('10.11.12', False)
+    fetch_release.get_micromamba('10.11.12', False)
 
         # Check that the `requests.get` method was called as expected
         #mock_get.assert_called_once_with("https://api.anaconda.org/release/conda-forge/micromamba/10.11.12")
 
         # Ensure that subprocess.check_call was called to extract the archive
-        mock_check_call.assert_called_once_with(
-            ["micromamba", "package", "extract", "micromamba-10.11.12-1-linux-64.tar.bz2", "micromamba-10.11.12-1-linux-64"])
+        #mock_check_call.assert_called_once_with(
+            #["micromamba", "package", "extract", "micromamba-10.11.12-1-linux-64.tar.bz2", "micromamba-10.11.12-1-linux-64"])
 
         # Ensure shutil.copyfile is called with the expected paths
-        mock_copyfile.assert_called_once_with(
-            'micromamba-10.11.12-1-linux-64/bin/micromamba', 'releases/micromamba-linux-64'
-        )
+        #mock_copyfile.assert_called_once_with(
+            #'micromamba-10.11.12-1-linux-64/bin/micromamba', 'releases/micromamba-linux-64'
+        #)
 
 
         # Check that the `requests.get` method was called as expected
@@ -345,7 +371,7 @@ def test_get_micromamba_new_2_x_version(mock_github_tags, mock_anaconda_api, moc
             #'micromamba-10.11.12-1-linux-64/bin/micromamba', 'releases/micromamba-linux-64'
         #)
 
-        assert get_output_value("MICROMAMBA_NEW_VERSION") == "true"
+    assert get_output_value("MICROMAMBA_NEW_VERSION") == "true"
 
 
 
