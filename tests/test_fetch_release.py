@@ -102,33 +102,33 @@ def test_get_micromamba_non_existing_version(use_default_version):
 @patch("shutil.copyfile")
 def test_get_micromamba_new_2_x_version(mock_get, mock_check_call, mock_copyfile):
     # Create a mock response object for get_all_tags_github (GitHub API)
-    mock_github_response = MagicMock()
-    mock_github_response.status_code = 200
-    mock_github_response.raise_for_status = MagicMock()
-    mock_github_response.json.return_value = [
-        {"name": "2.0.5-0"},
-        {"name": "latest"},
-    ]
+    #mock_github_response = MagicMock()
+    #mock_github_response.status_code = 200
+    #mock_github_response.raise_for_status = MagicMock()
+    #mock_github_response.json.return_value = [
+        #{"name": "2.0.5-0"},
+        #{"name": "latest"},
+    #]
 
     # Create a mock response object for the Anaconda API (Anaconda API)
-    mock_anaconda_response = MagicMock()
-    mock_anaconda_response.status_code = 200
-    mock_anaconda_response.raise_for_status = MagicMock()
+    #mock_anaconda_response = MagicMock()
+    #mock_anaconda_response.status_code = 200
+    #mock_anaconda_response.raise_for_status = MagicMock()
 
     ## Mock the response from the Anaconda API
-    #mock_response = MagicMock()
-    #mock_response.status_code = 200
-    #mock_response.raise_for_status = MagicMock()
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.raise_for_status = MagicMock()
 
     # Mock request content to return a byte string
     mocked_content = b"some random binary data representing a tar.bz2 file"
-    mock_anaconda_response.content = mocked_content
+    mock_response.content = mocked_content
 
     sha256 = hashlib.sha256()
     sha256.update(mocked_content)
     computed_checksum = sha256.hexdigest()
 
-    mock_anaconda_response.json.return_value = {
+    mock_response.json.return_value = {
         "distributions": [
             {
                 "attrs": {
@@ -194,18 +194,18 @@ def test_get_micromamba_new_2_x_version(mock_get, mock_check_call, mock_copyfile
     }
 
     # Use side_effect to simulate different responses for different requests
-    def side_effect(url, timeout=10):
-        if "github.com" in url:
-            return mock_github_response
-        elif "anaconda.org" in url:
-            return mock_anaconda_response
-        else:
-            raise ValueError(f"Unexpected URL: {url}")
+    #def side_effect(url, timeout=10):
+        #if "github.com" in url:
+            #return mock_github_response
+        #elif "anaconda.org" in url:
+            #return mock_anaconda_response
+        #else:
+            #raise ValueError(f"Unexpected URL: {url}")
 
     # Set the side_effect to mock_get
-    mock_get.side_effect = side_effect
+    #mock_get.side_effect = side_effect
 
-    #mock_get.return_value = mock_response
+    mock_get.return_value = mock_response
 
     # Mock subprocess.check_call to prevent actual command execution
     mock_check_call.return_value = None  # Simulate a successful call
@@ -226,7 +226,7 @@ def test_get_micromamba_new_2_x_version(mock_get, mock_check_call, mock_copyfile
     mock_copyfile.side_effect = mock_copyfile_side_effect
 
     # Mock existing GitHub tags to simulate the version already being tagged
-    with patch.object(fetch_release, 'get_all_tags_github', return_value={'2.0.5-0'}):
+    with patch.object(fetch_release, 'fetch_release.get_all_tags_github', return_value={'2.0.5-0'}):
         # Run the method with the mocked data
         fetch_release.get_micromamba('10.11.12', False)
 
