@@ -107,10 +107,10 @@ def mock_github_tags():
 @pytest.fixture
 def mock_anaconda_api():
     """Mock Anaconda.org API response."""
-    with patch('requests.get') as mock:
+    with patch('fetch_release.requests.get') as mock:
         # Simulate a new version available
         mock.status_code = 200
-        mock.raise_for_status = MagicMock()
+        #mock.raise_for_status = MagicMock()
 
         mocked_content = b"some random binary data representing a tar.bz2 file"
         mock.content = mocked_content
@@ -190,14 +190,14 @@ def mock_anaconda_api():
 @pytest.fixture
 def mock_check_call():
     """Mock subprocess.check_call"""
-    with patch('subprocess.check_call') as mock:
+    with patch('fetch_release.subprocess.check_call') as mock:
         mock.return_value = None
         yield mock
 
 @pytest.fixture
 def mock_copyfile():
     """Mock subprocess.check_call"""
-    with patch('shutil.copyfile') as mock:
+    with patch('fetch_release.shutil.copyfile') as mock:
         #mock.return_value = None
         def mock_copyfile_side_effect(*args, **kwargs): #src=None, dst=None, follow_symlinks=True):
             # Simulate that the source file exists
