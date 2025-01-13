@@ -1,0 +1,7 @@
+# Python caches
+*.pyc
+.pytest_cache/
+__pycache__
+
+# Generated files from tests
+*.tar.bz2

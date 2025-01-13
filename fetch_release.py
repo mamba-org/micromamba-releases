@@ -72,6 +72,7 @@ def get_micromamba(version, use_default_version):
     build = max(all_build)
 
     print(f"Existing versions: {existing_tags}")
+    print(f"Checking {version}-{build}")
     if f"{version}-{build}" in existing_tags:
         print("Tag already exists, skipping")
         set_output("MICROMAMBA_NEW_VERSION", "false")
@@ -150,7 +151,7 @@ def get_micromamba(version, use_default_version):
     else:
         set_output("MICROMAMBA_NEW_PRERELEASE", "true")
 
-    if is_stable and v.major == 2:
+    if is_stable and v.major >= 2:
         set_output("MICROMAMBA_LATEST", "true")
     else:
         set_output("MICROMAMBA_LATEST", "false")
