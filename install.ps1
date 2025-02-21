@@ -1,19 +1,15 @@
 <#
 .SYNOPSIS
-    Install micromamba on Windows with optional non-interactive default initialization.
+    Install micromamba on Windows with non-interactive default initialization when running without user interaction.
 
 .DESCRIPTION
     This script downloads and installs micromamba and adds it to your PATH.
     It supports both interactive and non-interactive initialization.
     If run interactively, it will prompt you whether to initialize micromamba
-    and allow you to specify a custom prefix. With the -AcceptDefaults switch,
-    it bypasses the prompts and automatically uses the default prefix 
+    and allow you to specify a custom prefix. When running non-interactively,
+    the script bypasses the prompts and automatically uses the default prefix
     ($Env:UserProfile\micromamba).
 #>
-
-param(
-    [switch]$AcceptDefaults
-)
 
 # check if VERSION env variable is set, otherwise use "latest"
 $RELEASE_URL = if ($null -eq $Env:VERSION) {
@@ -41,8 +37,8 @@ if ($PATH -notlike "*$Env:LocalAppData\micromamba*") {
     Write-Output "$MAMBA_INSTALL_PATH is already in PATH`n"
 }
 
-if ($null -eq $Host.UI.RawUI -or $AcceptDefaults) {
-    Write-Output "`nNon-interactive session or AcceptDefaults flag provided, initializing micromamba to $Env:UserProfile\micromamba`n"
+if ( ([Environment]::GetCommandLineArgs() -contains '-NonInteractive') -or [System.Console]::IsOutputRedirected -or (-not [Environment]::UserInteractive) ) {
+    Write-Output "`nNot an interactive session, initializing micromamba to $Env:UserProfile\micromamba`n"
     & $MAMBA_INSTALL_PATH shell init -s powershell -p $Env:UserProfile\micromamba
 } else {
     $choice = Read-Host "Do you want to initialize micromamba for the shell activate command? (Y/n)"
@@ -51,8 +47,7 @@ if ($null -eq $Host.UI.RawUI -or $AcceptDefaults) {
         if ($prefix -eq "") {
             $prefix = "$Env:UserProfile\micromamba"
         }
-
-        Write-Output "Initializing micromamba in  $prefix"
+        Write-Output "Initializing micromamba in $prefix"
         $MAMBA_INSTALL_PATH = Join-Path -Path $Env:LocalAppData -ChildPath micromamba\micromamba.exe
         Write-Output $MAMBA_INSTALL_PATH
         & $MAMBA_INSTALL_PATH shell init -s powershell -p $prefix
