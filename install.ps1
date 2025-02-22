@@ -27,7 +27,7 @@ if ($PATH -notlike "*$Env:LocalAppData\micromamba*") {
 # check if this is an interactive session
 if ($null -eq $Host.UI.RawUI) {
     Write-Output "`nNot an interactive session, initializing micromamba to $Env:UserProfile\micromamba`n"
-    & $MAMBA_INSTALL_PATH shell init -s powershell -p $Env:UserProfile\micromamba
+    & $MAMBA_INSTALL_PATH shell init -s powershell -r $Env:UserProfile\micromamba
 }
 
 $choice = Read-Host "Do you want to initialize micromamba for the shell activate command? (Y/n)"
