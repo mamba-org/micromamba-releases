@@ -27,7 +27,7 @@ if ($PATH -notlike "*$Env:LocalAppData\micromamba*") {
 # check if this is an interactive session
 if ($null -eq $Host.UI.RawUI) {
     Write-Output "`nNot an interactive session, initializing micromamba to $Env:UserProfile\micromamba`n"
-    & $MAMBA_INSTALL_PATH shell init -s powershell -p $Env:UserProfile\micromamba
+    & $MAMBA_INSTALL_PATH shell init -s powershell -r $Env:UserProfile\micromamba
 }
 
 $choice = Read-Host "Do you want to initialize micromamba for the shell activate command? (Y/n)"
@@ -40,7 +40,7 @@ if ($choice -eq "y" -or $choice -eq "Y" -or $choice -eq "") {
     Write-Output "Initializing micromamba in  $prefix"
     $MAMBA_INSTALL_PATH = Join-Path -Path $Env:LocalAppData -ChildPath micromamba\micromamba.exe
     Write-Output $MAMBA_INSTALL_PATH
-    & $MAMBA_INSTALL_PATH shell init -s powershell -p $prefix
+    & $MAMBA_INSTALL_PATH shell init -s powershell -r $prefix
 } else {
-    Write-Output "`nYou can always initialize powershell or cmd.exe with micromamba by running `nmicromamba shell init -s powershell -p $Env:UserProfile\micromamba`n"
+    Write-Output "`nYou can always initialize powershell or cmd.exe with micromamba by running `nmicromamba shell init -s powershell -r $Env:UserProfile\micromamba`n"
 }
