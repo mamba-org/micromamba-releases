@@ -26,19 +26,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
+      - name: Install micromamba (${{ matrix.os }}, ${{ matrix.shell }})
         # Need to force the shell to get the default *calling* shell right
         run: |
           ${{ matrix.shell }} -c 'cat ./install.sh | ${SHELL}'
-      - name: Test Micromamba
+      - name: Test micromamba
         # use either -l or -i to source .bash_profile or .bashrc/.zshrc
         run: |
           ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba
-      - name: Test Micromamba is found
-        # use either -l or -i to source .bash_profile or .bashrc/.zshrc
-        run: |
-          ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba --help
-      - name: Test Micromamba is found
+      - name: Test micromamba is found
         # use either -l or -i to source .bash_profile or .bashrc/.zshrc
         run: |
           ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba --help
@@ -50,3 +46,24 @@ jobs:
         # use either -l or -i to source .bash_profile or .bashrc/.zshrc
         run: |
           ${{ matrix.shell }} ${{ matrix.shell-source-param }} -ec micromamba activate -n test
+
+
+  test_install_ps1:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install micromamba using PowerShell
+        shell: pwsh
+        run: |
+          .\install.ps1
+          # Make updated `PATH` persistent in GHA
+          echo "PATH=$Env:LocalAppData\micromamba" >> $env:GITHUB_ENV
+      - name: Test micromamba after install.ps1
+        shell: pwsh
+        run: |
+          micromamba --help
+      - name: Test micromamba create
+        shell: pwsh
+        run: |
+          micromamba create -c conda-forge -n test python
