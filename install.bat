@@ -18,7 +18,7 @@ MOVE /Y micromamba.exe "%LOCALAPPDATA%\micromamba\micromamba.exe"
 REM check if this is an interactive shell
 if "%PROMPT%"=="" (
     echo Initializing micromamba in %USERPROFILE%\micromamba
-    "%LOCALAPPDATA%\micromamba\micromamba.exe" init -p "%USERPROFILE%\micromamba"
+    "%LOCALAPPDATA%\micromamba\micromamba.exe" shell init -r "%USERPROFILE%\micromamba"
 ) else (
 
     @REM REM Ask user if micromamba should be added to the PATH
@@ -43,6 +43,6 @@ if "%PROMPT%"=="" (
     if "%INITIALIZE:~0,1%"=="y" || "%INITIALIZE"=="" (
         REM Initialize micromamba
         echo Initializing micromamba in %USERPROFILE%\micromamba
-        "%LOCALAPPDATA%\micromamba\micromamba.exe" init -p "%USERPROFILE%\micromamba"
+        "%LOCALAPPDATA%\micromamba\micromamba.exe" shell init -r "%USERPROFILE%\micromamba"
     )
 )
