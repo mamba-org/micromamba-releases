@@ -1,10 +1,10 @@
 REM Check if environment variable VERSION is set
 if "%VERSION%"=="" (
     REM If not, set it to "latest"
-    SET VERSION=latest
+    SET RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-win-64"
+) else (
+    SET RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/download/%VERSION%/micromamba-win-64"
 )
-
-RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/%VERSION%/download/micromamba-win-64"
 
 REM Download micromamba using curl.exe
 curl.exe -L -o micromamba.exe %RELEASE_URL%
