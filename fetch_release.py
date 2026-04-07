@@ -15,6 +15,7 @@ known_subdirs = {
     "linux-64",
     "linux-ppc64le",
     "linux-aarch64",
+    "linux-riscv64",
     "osx-64",
     "osx-arm64",
     "win-64",
