@@ -4,7 +4,16 @@ if "%VERSION%"=="" (
     SET VERSION=latest
 )
 
-RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/%VERSION%/download/micromamba-win-64"
+REM Detect architecture (win-64 or win-arm64)
+if /I "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
+    SET ARCH=arm64
+) else if /I "%PROCESSOR_ARCHITEW6432%"=="ARM64" (
+    SET ARCH=arm64
+) else (
+    SET ARCH=64
+)
+
+RELEASE_URL="https://github.com/mamba-org/micromamba-releases/releases/%VERSION%/download/micromamba-win-%ARCH%"
 
 REM Download micromamba using curl.exe
 curl.exe -L -o micromamba.exe %RELEASE_URL%
