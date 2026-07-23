@@ -23,6 +23,7 @@ jobs:
           - {os: macos-latest, shell: zsh, shell-source-param: -i}
           - {os: macos-latest, shell: bash, shell-source-param: -l}
           - {os: windows-latest, shell: bash, shell-source-param: -l}
+          - {os: windows-11-arm, shell: bash, shell-source-param: -l}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,7 +50,11 @@ jobs:
 
 
   test_install_ps1:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, windows-11-arm]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
