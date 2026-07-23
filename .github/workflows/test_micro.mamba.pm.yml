@@ -34,6 +34,7 @@ jobs:
           - {os: macos-latest, shell: zsh, shell-source-param: -i}
           - {os: macos-latest, shell: bash, shell-source-param: -l}
           - {os: windows-latest, shell: bash, shell-source-param: -l}
+          - {os: windows-11-arm, shell: bash, shell-source-param: -l}
     steps:
       - name: Install Micromamba (${{ matrix.os }}, ${{ matrix.shell }})
         # Need to force the shell to get the default *calling* shell right

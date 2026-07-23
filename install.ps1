@@ -1,8 +1,15 @@
+# Detect architecture (win-64 or win-arm64)
+$Arch = if ($Env:PROCESSOR_ARCHITECTURE -eq "ARM64" -or $Env:PROCESSOR_ARCHITEW6432 -eq "ARM64") {
+    "arm64"
+} else {
+    "64"
+}
+
 # check if VERSION env variable is set, otherwise use "latest"
 $RELEASE_URL = if ($null -eq $Env:VERSION) {
-    "https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-win-64"
+    "https://github.com/mamba-org/micromamba-releases/releases/latest/download/micromamba-win-$Arch"
 } else {
-    "https://github.com/mamba-org/micromamba-releases/releases/download/$Env:VERSION/micromamba-win-64"
+    "https://github.com/mamba-org/micromamba-releases/releases/download/$Env:VERSION/micromamba-win-$Arch"
 }
 
 Write-Output "Downloading micromamba from $RELEASE_URL"

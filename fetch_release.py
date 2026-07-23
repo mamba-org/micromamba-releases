@@ -18,6 +18,7 @@ known_subdirs = {
     "osx-64",
     "osx-arm64",
     "win-64",
+    "win-arm64",
 }
 
 
@@ -114,10 +115,10 @@ def get_micromamba(version, use_default_version):
         extract_with_micromamba(dlloc, extract_dir)
 
         # move the file to the right place
-        if dplat != "win-64":
-            binary = extract_dir / "bin" / "micromamba"
-        else:
+        if dplat.startswith("win-"):
             binary = extract_dir / "Library" / "bin" / "micromamba.exe"
+        else:
+            binary = extract_dir / "bin" / "micromamba"
 
         outdir = Path("releases")
         outdir.mkdir(exist_ok=True)
@@ -127,7 +128,7 @@ def get_micromamba(version, use_default_version):
 
         # On Windows, we need to add the .exe extension explicitly
         # so that the file is recognized as an executable.
-        if dplat == "win-64":
+        if dplat.startswith("win-"):
             shutil.copyfile(binary, outdir / f"micromamba-{dplat}.exe")
 
         shutil.copyfile(dlloc, outdir / f"micromamba-{dplat}{ext}")
