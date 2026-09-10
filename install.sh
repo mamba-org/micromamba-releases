@@ -54,7 +54,7 @@ esac
 
 ARCH="$(uname -m)"
 case "$ARCH" in
-  aarch64|ppc64le|arm64)
+  aarch64|ppc64le|riscv64|arm64)
       ;;  # pass
   *)
     ARCH="64" ;;
@@ -66,7 +66,7 @@ if [ "$PLATFORM" = "win" ] && [ "$ARCH" = "aarch64" ]; then
 fi
 
 case "$PLATFORM-$ARCH" in
-  linux-aarch64|linux-ppc64le|linux-64|osx-arm64|osx-64|win-64|win-arm64)
+  linux-aarch64|linux-ppc64le|linux-riscv64|linux-64|osx-arm64|osx-64|win-64|win-arm64)
       ;;  # pass
   *)
     echo "Failed to detect your OS" >&2
