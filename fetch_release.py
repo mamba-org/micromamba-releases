@@ -136,7 +136,7 @@ def get_micromamba(version, use_default_version):
 
         # compute the sha256
         sha256 = hashlib.sha256()
-        with open(outdir / f"micromamba-{dplat}", "rb") as f:
+        with open(outdir / f"micromamba-{dplat}{ext}", "rb") as f:
             sha256.update(f.read())
 
         with open(outdir / f"micromamba-{dplat}{ext}.sha256", "w") as f:
