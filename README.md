@@ -4,7 +4,7 @@ This repository is used to distribute release builds of `micromamba`, the fast p
 micromamba is a single-file executable that is statically linked and can be dropped anywhere on the operating to get started with powerful package management and virtual environments.
 
 To install, copy and paste the commands from the following sections.
-The `pfx.dev` URLs are just shorthands for the URLs to the raw files on Github from this repository.
+The `micro.mamba.pm` URLs are just shorthands for the URLs to the raw files on Github from this repository.
 
 ### Linux / macOS / Windows (git bash)
 
